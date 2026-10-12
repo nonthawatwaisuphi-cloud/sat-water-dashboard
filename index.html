@@ -3,7 +3,6 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<!-- รีเฟรชหน้าจออัตโนมัติทุกๆ 15 นาที (900 วินาที) -->
 <meta http-equiv="refresh" content="900">
 <title>สถานการณ์น้ำทีม SAT รพ.พระนครศรีอยุธยา</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;600;800&display=swap" rel="stylesheet">
@@ -13,7 +12,7 @@
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
 body{margin:0;overflow-wrap:break-word;background:var(--bg);color:var(--ink);font-family:'Noto Sans Thai',system-ui,sans-serif;line-height:1.5}
-.wrap{width:100%;max-width:1100px;margin:0 auto;padding:16px;display:none;} /* ซ่อน wrap ไว้ก่อนจนกว่าจะล็อกอินผ่าน */
+.wrap{width:100%;max-width:1100px;margin:0 auto;padding:16px;display:none;}
 .wrap *{min-width:0}
 header{text-align:center;padding:8px 0 16px}
 h1{margin:0;line-height:1.3;font-size:clamp(20px,4.2vw,34px);font-weight:800;color:var(--accent)}
@@ -43,6 +42,14 @@ td{padding:3px 0;border-top:1px solid var(--line)}td:last-child{text-align:right
 .flow-label b { font-size: 20px; color: var(--water); font-weight: 800; line-height: 1; margin-right: 4px; }
 .flow-bar-bg { width: 100%; height: 14px; background: var(--line); border-radius: 7px; overflow: hidden; }
 .flow-bar-fill { height: 100%; background: linear-gradient(90deg, #5db7e8, var(--water)); border-radius: 7px; transition: width 0.5s ease; }
+
+/* ===== CSS สำหรับตารางผู้ป่วย ===== */
+.patient-table-wrap { overflow-x: auto; margin-top: 10px; }
+.patient-table { width: 100%; border-collapse: collapse; min-width: 600px; font-size: 14px; text-align: center; }
+.patient-table th, .patient-table td { border: 1px solid var(--line); padding: 10px 8px; }
+.patient-table th { background-color: var(--water); color: #fff; font-weight: 800; position: sticky; top: 0; }
+.patient-table tr:nth-child(even) { background-color: rgba(11,111,164,0.04); }
+.patient-table tr:hover { background-color: rgba(11,111,164,0.1); }
 
 footer{text-align:center;font-size:13px;color:var(--mute);padding:8px}
 a{color:var(--water)}
@@ -104,12 +111,9 @@ footer{margin-top:4px;padding:12px;border-top:1px solid var(--line)}
 /* ===== ระบบล็อกอิน (Login UI) ===== */
 .login-wrap { position:fixed; inset:0; background: linear-gradient(135deg, rgba(11,111,164,0.15), rgba(11,111,164,0.05)), var(--bg); z-index:9999; display:flex; align-items:center; justify-content:center; padding:20px; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
 .login-box { background: var(--card); padding: 40px 30px; border-radius: 20px; box-shadow: 0 10px 40px rgba(10,40,70,0.12); width: 100%; max-width: 360px; text-align: center; border: 1px solid var(--line); }
-
-/* เปลี่ยนขนาดกรอบโลโก้ให้พอดีรูป */
-.login-logo { width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; background: #fff; box-shadow: 0 4px 12px rgba(11,111,164,0.15); overflow: hidden; border: 2px solid var(--line); }
-
+.login-logo { width: 84px; height: 84px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; background: #fff; box-shadow: 0 4px 12px rgba(11,111,164,0.15); overflow: hidden; border: 3px solid #eef3f7; }
 .login-box h2 { color: var(--water); margin: 0 0 6px; font-size: 24px; font-weight: 800; justify-content:center;}
-.login-box h2::before { display: none; } /* ซ่อนขีดหน้า h2 สำหรับกล่องล็อกอิน */
+.login-box h2::before { display: none; } 
 .login-box p { font-size: 14px; color: var(--mute); margin: 0 0 28px; font-weight: 600; line-height: 1.4; }
 .login-input { width: 100%; padding: 14px 16px; margin-bottom: 14px; border: 2px solid var(--line); border-radius: 12px; font-size: 15px; font-family: inherit; background: var(--bg); color: var(--ink); outline: none; transition: all 0.3s ease; }
 .login-input:focus { border-color: var(--water); background: var(--card); box-shadow: 0 0 0 4px rgba(11,111,164,0.1); }
@@ -126,9 +130,7 @@ footer{margin-top:4px;padding:12px;border-top:1px solid var(--line)}
 <div id="loginOverlay" class="login-wrap">
   <div class="login-box">
     <div class="login-logo">
-      <!-- 📌 ใช้โลโก้กระทรวงสาธารณสุขแทนอิโมจิคลื่น -->
-      <!-- หากมีลิงก์รูป รพ.พระนครศรีอยุธยา ให้นำมาเปลี่ยนที่ src="" ได้เลยครับ -->
-      <img src="https://upload.wikimedia.org/wikipedia/th/f/fe/Moph.png" alt="โลโก้โรงพยาบาล" style="width: 100%; height: 100%; object-fit: contain; padding: 4px;">
+      <img src="https://upload.wikimedia.org/wikipedia/th/f/fe/Moph.png" alt="โลโก้กระทรวงสาธารณสุข" style="width: 100%; height: 100%; object-fit: contain; padding: 6px;">
     </div>
     <h2>เข้าสู่ระบบ</h2>
     <p>ระบบติดตามสถานการณ์น้ำ<br>ศูนย์ปฏิบัติการฉุกเฉิน (SAT)</p>
@@ -181,11 +183,11 @@ footer{margin-top:4px;padding:12px;border-top:1px solid var(--line)}
   </section>
 </div>
 
-<!-- 4) แดชบอร์ดสถานการณ์ผู้ป่วย (ดึงจาก Sheet) -->
+<!-- 4) แดชบอร์ดสถานการณ์ผู้ป่วย (ดึงข้อมูล Data มาวาดตาราง) -->
 <div class="row">
   <section id="patientImageContainer" style="grid-column: 1 / -1;">
     <h2>รายงานสถานการณ์ผู้ป่วย</h2>
-    <div id="patientImgWrap" style="text-align:center; color:var(--mute); font-size:14px; padding:10px 0;">กำลังโหลดภาพ...</div>
+    <div id="patientImgWrap" style="color:var(--mute); font-size:14px; padding:10px 0;">กำลังโหลดข้อมูล...</div>
     <div class="src" id="patientSrc">ที่มา: ทีม SAT รพ.พระนครศรีอยุธยา</div>
   </section>
 </div>
@@ -197,7 +199,7 @@ footer{margin-top:4px;padding:12px;border-top:1px solid var(--line)}
 /* ===== ตั้งค่า ===== */
 const PROVINCE = "พระนครศรีอยุธยา";
 // ⚠️ ห้ามลืม! แทนที่ URL นี้ด้วย URL Web App ของคุณ
-const PROXY = "https://script.google.com/macros/s/AKfycbwSieRwQMAO-nalO7Esfnk35-lmkoHGAYKQ16tf5PRw72dHmZPFFX3VHQhv9PcU0Sb2LQ/exec";
+const PROXY = "https://script.google.com/macros/s/AKfycbwfJ1lk6akFyoVWWIP6YQSA91F9f2HbW5dRm41GnHfJrKlU52JSaa4cIqphMafr00TPYw/exec";
 
 /* ===== ข้อมูล Dummy ระหว่างรอ API ===== */
 const DATA = {
@@ -285,8 +287,7 @@ async function refreshAllData() {
         const res = await fetch(PROXY + "?route=dashboard");
         if (!res.ok) throw new Error("HTTP " + res.status);
         const data = await res.json();
-        console.log("อัปเดตข้อมูลสำเร็จ:", data);
-
+        
         updateWeather(data.weather);
         updateWater(data.water);
         updateFlow(data.flow);
@@ -297,8 +298,8 @@ async function refreshAllData() {
         showMsg("ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้ กำลังลองใหม่...");
     }
     
-    // 📌 ดึงข้อมูลภาพผู้ป่วยแยกต่างหาก
-    fetchPatientImage();
+    // 📌 ดึงตารางผู้ป่วยแยกต่างหาก
+    fetchPatientTable();
 }
 
 function updateWeather(weather){
@@ -368,22 +369,43 @@ function updateImage(img){
     };
 }
 
-// 📌 ฟังก์ชันดึงรูปภาพผู้ป่วยจาก Google Sheets
-async function fetchPatientImage() {
+// 📌 ฟังก์ชันดึง "ข้อมูล Data" มาวาดเป็นตาราง HTML
+async function fetchPatientTable() {
     try {
         const res = await fetch(PROXY + "?route=patient");
         const data = await res.json();
-        if (data && data.url) {
-            const wrap = document.getElementById("patientImgWrap");
-            wrap.innerHTML = `<img id="patientImg" crossorigin="anonymous" alt="สถานการณ์ผู้ป่วย" style="max-width:100%; border-radius:10px; border:1px solid var(--line); margin-top:4px; display:inline-block;">`;
-            const img = document.getElementById("patientImg");
-            img.src = data.url;
-            img.onload = () => document.getElementById("patientSrc").innerHTML = "อัปเดตล่าสุด: " + data.update;
+        
+        if (data && data.tableData && data.tableData.length > 0) {
+            let html = '<div class="patient-table-wrap"><table class="patient-table">';
+            
+            // วนลูปอ่านข้อมูลทีละแถว
+            data.tableData.forEach((row, rowIndex) => {
+                // เช็กว่าแถวนี้ว่างเปล่าทั้งหมดหรือไม่ (ถ้าว่างให้ข้ามไป จะได้ตารางไม่โหว่)
+                const isEmptyRow = row.every(cell => cell.trim() === "");
+                if (isEmptyRow) return;
+
+                html += '<tr>';
+                row.forEach(cell => {
+                    // สมมติให้แถวแรก (rowIndex === 0) เป็นหัวตาราง (th)
+                    if (rowIndex === 0) {
+                        html += `<th>${cell}</th>`;
+                    } else {
+                        html += `<td>${cell}</td>`;
+                    }
+                });
+                html += '</tr>';
+            });
+            
+            html += '</table></div>';
+            
+            document.getElementById("patientImgWrap").innerHTML = html;
+            document.getElementById("patientSrc").innerHTML = "อัปเดตล่าสุด: " + data.update;
         } else {
-            document.getElementById("patientImgWrap").innerHTML = "ไม่พบข้อมูลรูปภาพผู้ป่วยในระบบ";
+            document.getElementById("patientImgWrap").innerHTML = "ไม่พบข้อมูลตารางผู้ป่วยในระบบ (หรือเกิดข้อผิดพลาด)";
         }
     } catch (err) {
-        console.error("Patient Image Error:", err);
+        console.error("Patient Table Error:", err);
+        document.getElementById("patientImgWrap").innerHTML = "เกิดข้อผิดพลาดในการดึงข้อมูล";
     }
 }
 
