@@ -228,6 +228,13 @@ footer{margin-top:4px;padding:12px;border-top:1px solid var(--line)}
 @keyframes lsBar{to{width:100%}}
 @keyframes lsDots{0%{content:""}25%{content:"."}50%{content:".."}75%{content:"..."}}
 
+
+/* ===== แจ้งเตือนล็อกอินไม่สำเร็จ (แสดงแล้วหายเอง) ===== */
+#loginMsg{transition:opacity .4s ease,transform .4s ease}
+#loginMsg.show{background:rgba(217,56,30,.1);border:1px solid rgba(217,56,30,.35);border-radius:10px;padding:9px 12px}
+.login-box.shake{animation:lsShake .45s ease}
+@keyframes lsShake{10%,90%{transform:translateX(-2px)}20%,80%{transform:translateX(4px)}30%,50%,70%{transform:translateX(-7px)}40%,60%{transform:translateX(7px)}}
+
 /* ===== ระบบล็อกอิน (Login UI) ===== */
 .login-wrap { position:fixed; inset:0; background: linear-gradient(135deg, rgba(11,111,164,0.15), rgba(11,111,164,0.05)), var(--bg); z-index:9999; display:flex; align-items:center; justify-content:center; padding:20px; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
 .login-box { background: var(--card); padding: 40px 30px; border-radius: 20px; box-shadow: 0 10px 40px rgba(10,40,70,0.12); width: 100%; max-width: 360px; text-align: center; border: 1px solid var(--line); }
@@ -324,6 +331,9 @@ footer{margin-top:4px;padding:12px;border-top:1px solid var(--line)}
 <script>
 /* ===== ตั้งค่า ===== */
 const PROVINCE = "พระนครศรีอยุธยา";
+// ระยะเวลาล็อกอิน (ชั่วโมง) — เปลี่ยนตัวเลขนี้ที่เดียว
+const SESSION_HOURS = 8;
+const SESSION_MS = SESSION_HOURS * 60 * 60 * 1000;
 // ⚠️ ห้ามลืม! แทนที่ URL นี้ด้วย URL Web App ของคุณ
 const PROXY = "https://script.google.com/macros/s/AKfycbypV_zZOxuxx2ZzOFQxyb15p8JxGMgDf6dI0v8H5Wh6qgEKsPxyCsswv-NCmyzvJBp9YQ/exec";
 
@@ -656,8 +666,7 @@ let dashboardInterval;
 
 window.addEventListener("load", () => {
     const authTime = localStorage.getItem("sat_auth_time");
-    const ONE_HOUR = 60 * 60 * 1000; 
-    if (authTime && (Date.now() - parseInt(authTime) < ONE_HOUR)) {
+    if (authTime && (Date.now() - parseInt(authTime) < SESSION_MS)) {
         document.getElementById("loginOverlay").style.display = "none";
         document.getElementById("mainDashboard").style.display = "block";
         startDashboard();
@@ -675,9 +684,8 @@ function startDashboard() {
 
     setInterval(() => {
         const authTime = localStorage.getItem("sat_auth_time");
-        const ONE_HOUR = 60 * 60 * 1000;
-        if (!authTime || (Date.now() - parseInt(authTime) >= ONE_HOUR)) {
-            alert("หมดเวลาการใช้งาน (1 ชั่วโมง) ระบบจะทำการออกจากระบบอัตโนมัติ");
+        if (!authTime || (Date.now() - parseInt(authTime) >= SESSION_MS)) {
+            alert("หมดเวลาการใช้งาน (" + SESSION_HOURS + " ชั่วโมง) ระบบจะทำการออกจากระบบอัตโนมัติ");
             localStorage.removeItem("sat_auth_time");
             location.reload(); 
         }
@@ -691,7 +699,9 @@ document.getElementById("btnLogout").addEventListener("click", () => {
     document.getElementById("loginOverlay").style.display = "flex";
     document.getElementById("usr").value = "";
     document.getElementById("pwd").value = "";
+    clearTimeout(loginMsgTimer);
     document.getElementById("loginMsg").textContent = "";
+    document.getElementById("loginMsg").classList.remove("show");
     document.querySelector(".login-box").classList.remove("ok");
 });
 
@@ -704,13 +714,32 @@ document.getElementById("pwd").addEventListener("keypress", function(event) {
   }
 });
 
+
+let loginMsgTimer;
+function flashLoginMsg(text, shake){
+    const m = document.getElementById("loginMsg");
+    clearTimeout(loginMsgTimer);
+    m.textContent = text;
+    m.classList.add("show");
+    m.style.opacity = "1";
+    if (shake) {
+        const box = document.querySelector(".login-box");
+        box.classList.remove("shake"); void box.offsetWidth; box.classList.add("shake");
+        box.addEventListener("animationend", () => box.classList.remove("shake"), {once:true});
+    }
+    loginMsgTimer = setTimeout(() => {          // แสดง 3 วินาที แล้วค่อยๆ จางหาย
+        m.style.opacity = "0";
+        loginMsgTimer = setTimeout(() => { m.textContent = ""; m.classList.remove("show"); }, 400);
+    }, 3000);
+}
+
 async function performLogin() {
     const u = document.getElementById("usr").value;
     const p = document.getElementById("pwd").value;
     const msg = document.getElementById("loginMsg");
     const btn = document.getElementById("btnLogin");
-    if (!u || !p) { msg.textContent = "กรุณากรอกข้อมูลให้ครบถ้วน"; return; }
-    btn.disabled = true; btn.textContent = "กำลังตรวจสอบ..."; msg.textContent = "";
+    if (!u || !p) { flashLoginMsg("กรุณากรอกข้อมูลให้ครบถ้วน"); return; }
+    btn.disabled = true; btn.textContent = "กำลังตรวจสอบ..."; clearTimeout(loginMsgTimer); msg.textContent = ""; msg.classList.remove("show");
     try {
         const res = await fetch(PROXY + `?route=login&user=${encodeURIComponent(u)}&pass=${encodeURIComponent(p)}`);
         const data = await res.json();
@@ -723,10 +752,10 @@ async function performLogin() {
                 document.getElementById("mainDashboard").style.display = "block";
             }, 1800);
         } else {
-            msg.textContent = "❌ ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง";
+            flashLoginMsg("❌ ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง", true);
         }
     } catch(e) {
-        msg.textContent = "⚠️ เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์";
+        flashLoginMsg("⚠️ เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์");
     }
     btn.disabled = false; btn.textContent = "เข้าสู่ระบบ";
 }
