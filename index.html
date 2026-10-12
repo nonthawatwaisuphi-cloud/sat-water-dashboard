@@ -558,7 +558,6 @@ async function fetchPatientTable() {
         if (html) {
             wrap.style.padding = "0";
             wrap.innerHTML = html;
-            document.getElementById("patientSrc").textContent = "อัปเดตล่าสุด: " + (data.update || "-") + " · ทีม SAT รพ.พระนครศรีอยุธยา";
         } else {
             wrap.innerHTML = `<div class="empty">ไม่พบข้อมูลรายงานผู้ป่วยในระบบ</div>`;
         }
