@@ -248,25 +248,6 @@ footer{margin-top:4px;padding:12px;border-top:1px solid var(--line)}
 .login-fail .ls-bar i{width:100%;background:linear-gradient(90deg,#f08a74,var(--bad));animation:lsDrain 2.6s linear forwards}
 @keyframes lsDrain{to{width:0}}
 
-
-/* ===== แจ้งหมดเวลา + เตือนก่อนหมดเวลา ===== */
-.login-box.expired>h2,.login-box.expired>p,.login-box.expired>.login-input,.login-box.expired>.login-btn,.login-box.expired>#loginMsg{display:none}
-.login-box.expired .login-expired{display:flex}
-.login-box.expired .login-logo{margin-bottom:20px}
-.login-expired{display:none;flex-direction:column;align-items:center;gap:6px;padding:4px 0 6px}
-.login-expired .chk{width:72px;height:72px;margin-bottom:8px;animation:lsPop .5s cubic-bezier(.2,1.4,.4,1) both}
-.login-expired .chk circle{fill:rgba(232,162,0,.14);stroke:var(--warn);stroke-width:3;stroke-dasharray:151;stroke-dashoffset:151;animation:lsDraw .6s ease-out .05s forwards}
-.login-expired .chk path{fill:none;stroke:var(--warn);stroke-width:4;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:50;stroke-dashoffset:50;animation:lsDraw .5s ease-out .5s forwards}
-.login-expired .ls-t{color:#b97f00}
-.login-expired .ls-s{line-height:1.6;color:var(--mute)}
-.login-expired .login-btn{margin-top:16px}
-.exp-warn{display:none;position:fixed;left:50%;bottom:20px;transform:translateX(-50%);z-index:200;align-items:center;gap:14px;max-width:92%;background:#16324a;color:#fff;border-left:5px solid var(--warn);border-radius:12px;padding:11px 14px 11px 18px;box-shadow:0 10px 30px rgba(10,40,70,.35);font-size:14px;font-weight:600}
-.exp-warn.show{display:flex;animation:lsPop .35s ease both}
-.exp-warn b{font-variant-numeric:tabular-nums;color:#ffd166;font-size:16px}
-.exp-warn button{flex:none;border:0;border-radius:8px;background:var(--warn);color:#2b1d00;font:800 14px 'Noto Sans Thai',sans-serif;padding:7px 16px;cursor:pointer}
-.exp-warn button:hover{filter:brightness(1.08)}
-@media print{.exp-warn{display:none!important}}
-
 /* ===== ระบบล็อกอิน (Login UI) ===== */
 .login-wrap { position:fixed; inset:0; background: linear-gradient(135deg, rgba(11,111,164,0.15), rgba(11,111,164,0.05)), var(--bg); z-index:9999; display:flex; align-items:center; justify-content:center; padding:20px; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
 .login-box { background: var(--card); padding: 40px 30px; border-radius: 20px; box-shadow: 0 10px 40px rgba(10,40,70,0.12); width: 100%; max-width: 360px; text-align: center; border: 1px solid var(--line); }
@@ -309,20 +290,7 @@ footer{margin-top:4px;padding:12px;border-top:1px solid var(--line)}
       <div class="ls-s" id="failSub">ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง</div>
       <div class="ls-bar"><i></i></div>
     </div>
-    <div id="loginExpired" class="login-expired" role="alert">
-      <svg class="chk" viewBox="0 0 52 52" aria-hidden="true"><circle cx="26" cy="26" r="24"/><path d="M26 14v13l9 6"/></svg>
-      <div class="ls-t">หมดเวลาการใช้งาน</div>
-      <div class="ls-s">ครบ <span id="expHours">8</span> ชั่วโมงแล้ว ระบบออกจากระบบอัตโนมัติ<br>เพื่อความปลอดภัยของข้อมูล</div>
-      <button class="login-btn" id="btnExpOk" type="button">เข้าสู่ระบบอีกครั้ง</button>
-    </div>
   </div>
-</div>
-
-
-<!-- ⏰ แจ้งเตือนก่อนหมดเวลา -->
-<div id="expWarn" class="exp-warn" data-html2canvas-ignore="true" role="alert">
-  <span>⏰ ระบบจะออกจากระบบอัตโนมัติใน <b id="expLeft">5:00</b></span>
-  <button id="btnExtend" type="button">ต่อเวลา</button>
 </div>
 
 <div class="wrap" id="mainDashboard">
@@ -733,39 +701,15 @@ function startDashboard() {
     refreshAllData();
     dashboardInterval = setInterval(refreshAllData, 600000); 
 
-    clearInterval(sessionTimer);
-    sessionTimer = setInterval(checkSession, 1000);
+    setInterval(() => {
+        const authTime = localStorage.getItem("sat_auth_time");
+        if (!authTime || (Date.now() - parseInt(authTime) >= SESSION_MS)) {
+            alert("หมดเวลาการใช้งาน (" + SESSION_HOURS + " ชั่วโมง) ระบบจะทำการออกจากระบบอัตโนมัติ");
+            localStorage.removeItem("sat_auth_time");
+            location.reload(); 
+        }
+    }, 60000);
 }
-
-/* ===== หมดเวลาใช้งาน: เตือนก่อน 5 นาที แล้วออกจากระบบอัตโนมัติ ===== */
-const WARN_MS = 5 * 60 * 1000;
-let sessionTimer;
-function checkSession(){
-    const t = parseInt(localStorage.getItem("sat_auth_time"));
-    const warn = document.getElementById("expWarn");
-    const left = t ? SESSION_MS - (Date.now() - t) : 0;
-    if (left <= 0) { forceLogout(); return; }
-    if (left <= WARN_MS) {
-        const sec = Math.ceil(left / 1000);
-        document.getElementById("expLeft").textContent = Math.floor(sec / 60) + ":" + String(sec % 60).padStart(2, "0");
-        warn.classList.add("show");
-    } else {
-        warn.classList.remove("show");
-    }
-}
-function forceLogout(){
-    document.getElementById("btnLogout").click();                 // ใช้ขั้นตอนออกจากระบบเดิม
-    document.getElementById("expHours").textContent = SESSION_HOURS;
-    document.querySelector(".login-box").classList.add("expired"); // แสดงกล่อง "หมดเวลาการใช้งาน"
-}
-document.getElementById("btnExtend").addEventListener("click", () => {
-    localStorage.setItem("sat_auth_time", Date.now().toString());
-    document.getElementById("expWarn").classList.remove("show");
-});
-document.getElementById("btnExpOk").addEventListener("click", () => {
-    document.querySelector(".login-box").classList.remove("expired");
-    document.getElementById("usr").focus();
-});
 
 document.getElementById("btnLogout").addEventListener("click", () => {
     localStorage.removeItem("sat_auth_time"); 
@@ -778,9 +722,7 @@ document.getElementById("btnLogout").addEventListener("click", () => {
     document.getElementById("loginMsg").textContent = "";
     document.getElementById("loginMsg").classList.remove("show");
     clearTimeout(loginFailTimer);
-    clearInterval(sessionTimer);
-    document.getElementById("expWarn").classList.remove("show");
-    document.querySelector(".login-box").classList.remove("ok","fail","expired");
+    document.querySelector(".login-box").classList.remove("ok","fail");
 });
 
 document.getElementById("btnLogin").addEventListener("click", performLogin);
