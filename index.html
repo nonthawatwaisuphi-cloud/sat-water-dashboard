@@ -77,9 +77,6 @@ h2::before{content:"";flex:none;width:5px;height:1.1em;border-radius:3px;backgro
 .day.today .dn{color:var(--water)}
 .stations{gap:14px}
 .st{padding:14px;border-radius:10px}
-.alert{border-left:5px solid var(--bad)}
-.alert h2::before{background:var(--bad)}
-.alert p{font-size:15px;line-height:1.7}
 .flow div{padding:10px}
 footer{margin-top:4px;padding:12px;border-top:1px solid var(--line)}
 @media(max-width:560px){.hd{padding:14px}#savePng{width:100%}.hero b{font-size:30px}}
@@ -117,17 +114,18 @@ footer{margin-top:4px;padding:12px;border-top:1px solid var(--line)}
   <div class="src" id="stsrc"></div>
 </section>
 
-<!-- 3) เจ้าพระยา & ประกาศเตือน -->
+<!-- 3) เจ้าพระยา & แผนภาพ -->
 <div class="row">
   <section>
     <h2>แม่น้ำเจ้าพระยา (กรมชลประทาน)</h2>
     <div class="flow" id="flow"></div>
     <div class="src">ข้อมูลจากรายงานสถานการณ์น้ำ กรมชลประทาน</div>
   </section>
-  <section class="alert">
-    <h2>ประกาศเตือนล่าสุด</h2>
-    <p id="warn" style="margin:0"></p>
-    <div class="src">ที่มา: กรมชลประทาน / เทศบาลนครพระนครศรีอยุธยา</div>
+  <!-- เปลี่ยนกล่องประกาศเตือน เป็นกล่องรูปภาพ -->
+  <section id="ridImageContainer">
+    <h2>แผนภาพสถานการณ์น้ำ</h2>
+    <div id="ridImgWrap" style="color:var(--mute); font-size:14px; padding:10px 0;">กำลังโหลดภาพ...</div>
+    <div class="src" id="ridSrc">ที่มา: กรมชลประทาน</div>
   </section>
 </div>
 
@@ -137,7 +135,7 @@ footer{margin-top:4px;padding:12px;border-top:1px solid var(--line)}
 <script>
 /* ===== ตั้งค่า ===== */
 const PROVINCE = "พระนครศรีอยุธยา";
-// ⚠️ ห้ามลืม! แทนที่ URL นี้ด้วย URL Web App ของคุณเองที่เพิ่ง Deploy มาใหม่
+// ⚠️ คง URL เดิมของคุณไว้
 const PROXY = "https://script.google.com/macros/s/AKfycbyWf_s8uydfXkJqc7JeZZsJ12yZYlo5INppXQEkVWqOQh5bGj02vioI3orZLeXZoLYirw/exec";
 
 /* ===== ข้อมูล Dummy ระหว่างรอ API ===== */
@@ -149,8 +147,7 @@ const DATA = {
     {name:"ท้ายเขื่อนเจ้าพระยา (C13)",code:"C.13",status:"รอข้อมูล",color:"#5d7184",diff:"0",level:"0",bank:"16.34",bed:"2.08",time:"-",history:null}
   ],
   histStep: 6,
-  flow: [],
-  warn: "กำลังดึงข้อมูลล่าสุดจากเซิร์ฟเวอร์..."
+  flow: []
 };
 
 /* ===== แสดงวันที่ปัจจุบัน ===== */
@@ -236,10 +233,7 @@ async function refreshAllData() {
         updateWeather(data.weather);
         updateWater(data.water);
         updateFlow(data.flow);
-        updateWarning(data.warning);
-        updateImage(data.image);
-        
-        // (ลบอัปเดต updateSAT ออกไปแล้ว เพราะไม่มีแสดงผลแล้ว)
+        updateImage(data.image); 
 
     } catch (err) {
         console.error("Dashboard Error:", err);
@@ -251,7 +245,6 @@ async function refreshAllData() {
 window.addEventListener("load", () => {
     // วาดโครงเปล่าๆ ระหว่างรอโหลด
     drawStations();
-    document.getElementById("warn").textContent = DATA.warn;
     
     // ดึงข้อมูลจริงจาก Apps Script
     refreshAllData();
@@ -273,7 +266,6 @@ function updateWeather(weather){
 }
 
 function updateWater(w){
-    // ถ้าไม่มีข้อมูล หรือมี Error ส่งมาจากหลังบ้าน หรือสถานีเป็น 0
     if(!w || w.error || !w.stations || w.stations.length === 0) {
         document.getElementById("sum").innerHTML = `<span style="color:var(--bad)">⚠️ ไม่สามารถดึงข้อมูลระดับน้ำได้ในขณะนี้ (เซิร์ฟเวอร์ ThaiWater อาจขัดข้อง)</span>`;
         return;
@@ -294,25 +286,15 @@ function updateFlow(flow){
     `).join("");
 }
 
-function updateWarning(w){
-    if(!w) return;
-    document.getElementById("warn").innerHTML = `<b>${w.title}</b><br>${w.detail}`;
-}
-
+// 📌 ฟังก์ชันจัดการรูปภาพ (ปรับให้แสดงในกล่องแทนการต่อท้ายหน้าเว็บ)
 function updateImage(img){
-    if(!img || !img.image) return;
-    let sec = document.getElementById("ridImage");
-    if(!sec){
-        sec = document.createElement("section");
-        sec.id = "ridImage";
-        sec.innerHTML = `
-            <h2>แผนภาพสถานการณ์น้ำแม่น้ำเจ้าพระยา (กรมชลประทาน)</h2>
-            <img id="ridImg" crossorigin="anonymous" alt="แผนภาพสถานการณ์น้ำ" style="width:100%; display:block; border-radius:10px; border:1px solid #ddd; margin-top:10px">
-            <div class="src" id="ridSrc"></div>
-        `;
-        const footer = document.querySelector("footer");
-        footer.parentNode.insertBefore(sec, footer);
+    if(!img || !img.image) {
+       document.getElementById("ridImgWrap").innerHTML = "ไม่พบภาพข้อมูลล่าสุด";
+       return;
     }
+    const wrap = document.getElementById("ridImgWrap");
+    wrap.innerHTML = `<img id="ridImg" crossorigin="anonymous" alt="แผนภาพสถานการณ์น้ำ" style="width:100%; display:block; border-radius:10px; border:1px solid var(--line); margin-top:4px">`;
+    
     const image = document.getElementById("ridImg");
     if (img.image.startsWith("data:")) {
         image.src = img.image;
@@ -320,11 +302,11 @@ function updateImage(img){
         let cleanUrl = img.image.replace("https://", "").replace("http://", "");
         image.src = "https://wsrv.nl/?url=" + encodeURIComponent(cleanUrl);
     }
-    image.onload = () => document.getElementById("ridSrc").innerHTML = "ข้อมูลล่าสุด " + img.update;
+    image.onload = () => document.getElementById("ridSrc").innerHTML = "อัปเดตล่าสุด: " + img.update + " · กรมชลประทาน";
     image.onerror = () => {
         image.removeAttribute("crossorigin");
         image.src = img.image;
-        document.getElementById("ridSrc").innerHTML = "ข้อมูลล่าสุด " + img.update + " (เซฟภาพ PNG อาจไม่ติดรูป)";
+        document.getElementById("ridSrc").innerHTML = "อัปเดตล่าสุด: " + img.update + " (เซฟภาพ PNG อาจไม่ติดรูป) · กรมชลประทาน";
     };
 }
 
