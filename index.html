@@ -209,6 +209,25 @@ footer{margin-top:4px;padding:12px;border-top:1px solid var(--line)}
 #ridImgWrap>.empty{min-height:120px;display:flex;align-items:center;justify-content:center}
 @media(prefers-reduced-motion:reduce){.pt-loading .spin{animation-duration:2.5s}}
 
+
+/* ===== แจ้งล็อกอินสำเร็จ ===== */
+.login-success{display:none;flex-direction:column;align-items:center;gap:6px;padding:4px 0 6px}
+.login-box.ok h2,.login-box.ok>p,.login-box.ok .login-input,.login-box.ok .login-btn,.login-box.ok #loginMsg{display:none}
+.login-box.ok .login-success{display:flex}
+.login-box.ok .login-logo{margin-bottom:20px}
+.login-success .chk{width:72px;height:72px;margin-bottom:8px;animation:lsPop .5s cubic-bezier(.2,1.4,.4,1) both}
+.login-success .chk circle{fill:rgba(46,158,91,.12);stroke:var(--ok);stroke-width:3;stroke-dasharray:151;stroke-dashoffset:151;animation:lsDraw .6s ease-out .05s forwards}
+.login-success .chk path{fill:none;stroke:var(--ok);stroke-width:4;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:40;stroke-dashoffset:40;animation:lsDraw .4s ease-out .5s forwards}
+.ls-t{font-size:22px;font-weight:800;color:var(--ok)}
+.ls-s{font-size:15px;font-weight:600;color:var(--ink)}
+.dots::after{content:"";animation:lsDots 1.2s steps(1,end) infinite}
+.ls-bar{width:100%;height:6px;border-radius:3px;background:var(--line);overflow:hidden;margin-top:14px}
+.ls-bar i{display:block;height:100%;width:0;border-radius:3px;background:linear-gradient(90deg,#5db7e8,var(--water));animation:lsBar 1.7s ease-in-out forwards}
+@keyframes lsDraw{to{stroke-dashoffset:0}}
+@keyframes lsPop{from{transform:scale(.4);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes lsBar{to{width:100%}}
+@keyframes lsDots{0%{content:""}25%{content:"."}50%{content:".."}75%{content:"..."}}
+
 /* ===== ระบบล็อกอิน (Login UI) ===== */
 .login-wrap { position:fixed; inset:0; background: linear-gradient(135deg, rgba(11,111,164,0.15), rgba(11,111,164,0.05)), var(--bg); z-index:9999; display:flex; align-items:center; justify-content:center; padding:20px; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
 .login-box { background: var(--card); padding: 40px 30px; border-radius: 20px; box-shadow: 0 10px 40px rgba(10,40,70,0.12); width: 100%; max-width: 360px; text-align: center; border: 1px solid var(--line); }
@@ -239,6 +258,12 @@ footer{margin-top:4px;padding:12px;border-top:1px solid var(--line)}
     <input type="password" id="pwd" class="login-input" placeholder="รหัสผ่าน (Password)">
     <button id="btnLogin" class="login-btn">เข้าสู่ระบบ</button>
     <div id="loginMsg" style="color:var(--bad);font-size:13px;margin-top:16px;font-weight:600;min-height:19px;"></div>
+    <div id="loginSuccess" class="login-success" role="status" aria-live="polite">
+      <svg class="chk" viewBox="0 0 52 52" aria-hidden="true"><circle cx="26" cy="26" r="24"/><path d="M14 27l8 8 16-17"/></svg>
+      <div class="ls-t">ล็อกอินสำเร็จ</div>
+      <div class="ls-s">กำลังเข้าสู่ระบบ SAT<span class="dots"></span></div>
+      <div class="ls-bar"><i></i></div>
+    </div>
   </div>
 </div>
 
@@ -667,6 +692,7 @@ document.getElementById("btnLogout").addEventListener("click", () => {
     document.getElementById("usr").value = "";
     document.getElementById("pwd").value = "";
     document.getElementById("loginMsg").textContent = "";
+    document.querySelector(".login-box").classList.remove("ok");
 });
 
 document.getElementById("btnLogin").addEventListener("click", performLogin);
@@ -690,9 +716,12 @@ async function performLogin() {
         const data = await res.json();
         if (data.success) {
             localStorage.setItem("sat_auth_time", Date.now().toString());
-            document.getElementById("loginOverlay").style.display = "none";
-            document.getElementById("mainDashboard").style.display = "block";
-            startDashboard();
+            document.querySelector(".login-box").classList.add("ok");   // แสดง "ล็อกอินสำเร็จ"
+            startDashboard();                                           // เริ่มโหลดข้อมูลไปพร้อมกัน
+            setTimeout(() => {
+                document.getElementById("loginOverlay").style.display = "none";
+                document.getElementById("mainDashboard").style.display = "block";
+            }, 1800);
         } else {
             msg.textContent = "❌ ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง";
         }
