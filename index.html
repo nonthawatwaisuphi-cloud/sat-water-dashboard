@@ -13,7 +13,7 @@
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
 body{margin:0;overflow-wrap:break-word;background:var(--bg);color:var(--ink);font-family:'Noto Sans Thai',system-ui,sans-serif;line-height:1.5}
-.wrap{width:100%;max-width:1100px;margin:0 auto;padding:16px}
+.wrap{width:100%;max-width:1100px;margin:0 auto;padding:16px;display:none;} /* ซ่อน wrap ไว้ก่อนจนกว่าจะล็อกอินผ่าน */
 .wrap *{min-width:0}
 header{text-align:center;padding:8px 0 16px}
 h1{margin:0;line-height:1.3;font-size:clamp(20px,4.2vw,34px);font-weight:800;color:var(--accent)}
@@ -95,7 +95,20 @@ footer{margin-top:4px;padding:12px;border-top:1px solid var(--line)}
 </style>
 </head>
 <body>
-<div class="wrap">
+
+<!-- 📌 หน้าต่างล็อกอิน -->
+<div id="loginOverlay" style="position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;align-items:center;justify-content:center;flex-direction:column;padding:20px;">
+  <div style="background:#fff;padding:34px;border-radius:12px;box-shadow:0 4px 20px rgba(11,111,164,0.15);width:100%;max-width:340px;text-align:center;">
+    <h2 style="color:var(--water);margin-bottom:8px;font-size:22px;">🔒 เข้าสู่ระบบ</h2>
+    <p style="font-size:13px;color:var(--mute);margin-bottom:24px;">ระบบติดตามสถานการณ์น้ำ ทีม SAT</p>
+    <input type="text" id="usr" placeholder="ชื่อผู้ใช้ (Username)" style="width:100%;padding:12px;margin-bottom:12px;border:1px solid var(--line);border-radius:8px;font-size:14px;outline:none;">
+    <input type="password" id="pwd" placeholder="รหัสผ่าน (Password)" style="width:100%;padding:12px;margin-bottom:24px;border:1px solid var(--line);border-radius:8px;font-size:14px;outline:none;">
+    <button id="btnLogin" style="width:100%;padding:12px;background:var(--water);color:#fff;border:none;border-radius:8px;font-weight:600;font-size:15px;cursor:pointer;transition:0.2s;">เข้าสู่ระบบ</button>
+    <div id="loginMsg" style="color:var(--bad);font-size:13px;margin-top:14px;font-weight:600;"></div>
+  </div>
+</div>
+
+<div class="wrap" id="mainDashboard">
 <header class="hd">
   <div>
     <h1>สถานการณ์น้ำทีม SAT รพ.พระนครศรีอยุธยา</h1>
@@ -246,16 +259,6 @@ async function refreshAllData() {
     }
 }
 
-// รอให้ HTML โหลดเสร็จก่อน
-window.addEventListener("load", () => {
-    // วาดโครงเปล่าๆ ระหว่างรอโหลด
-    drawStations();
-    
-    // ดึงข้อมูลจริงจาก Apps Script
-    refreshAllData();
-    setInterval(refreshAllData, 600000); // รีเฟรชอัตโนมัติทุก 10 นาที
-});
-
 /* ===== อัปเดต UI แต่ละส่วน ===== */
 function updateWeather(weather){
     if(!weather || !weather.WeatherForecasts) return;
@@ -372,6 +375,70 @@ document.getElementById("savePng").addEventListener("click", async e=>{
     btn.disabled = false; btn.textContent = "💾 บันทึกเป็นภาพ PNG";
   }
 });
+
+/* ===== ระบบล็อกอิน & เริ่มการทำงาน Dashboard ===== */
+window.addEventListener("load", () => {
+    // เช็กว่าเบราว์เซอร์นี้เคยล็อกอินผ่านแล้วหรือยัง
+    if (localStorage.getItem("sat_auth") === "true") {
+        document.getElementById("loginOverlay").style.display = "none";
+        document.getElementById("mainDashboard").style.display = "block";
+        startDashboard();
+    }
+});
+
+function startDashboard() {
+    drawStations();
+    refreshAllData();
+    setInterval(refreshAllData, 600000); // รีเฟรชอัตโนมัติทุก 10 นาที
+}
+
+// ผูกอีเวนต์กดปุ่มเข้าสู่ระบบ
+document.getElementById("btnLogin").addEventListener("click", performLogin);
+
+// ผูกอีเวนต์กดปุ่ม Enter ให้ล็อกอินได้เลย
+document.getElementById("pwd").addEventListener("keypress", function(event) {
+  if (event.key === "Enter") {
+    event.preventDefault();
+    performLogin();
+  }
+});
+
+async function performLogin() {
+    const u = document.getElementById("usr").value;
+    const p = document.getElementById("pwd").value;
+    const msg = document.getElementById("loginMsg");
+    const btn = document.getElementById("btnLogin");
+    
+    if (!u || !p) { 
+        msg.textContent = "กรุณากรอกข้อมูลให้ครบถ้วน"; 
+        return; 
+    }
+    
+    btn.disabled = true; 
+    btn.textContent = "กำลังตรวจสอบ...";
+    msg.textContent = "";
+    
+    try {
+        // ส่ง username / password ไปเช็กที่ Apps Script
+        const res = await fetch(PROXY + `?route=login&user=${u}&pass=${p}`);
+        const data = await res.json();
+        
+        if (data.success) {
+            // รหัสถูกต้อง -> บันทึกสถานะลงเบราว์เซอร์ แล้วแสดงหน้า Dashboard
+            localStorage.setItem("sat_auth", "true");
+            document.getElementById("loginOverlay").style.display = "none";
+            document.getElementById("mainDashboard").style.display = "block";
+            startDashboard();
+        } else {
+            msg.textContent = "❌ ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง";
+        }
+    } catch(e) {
+        msg.textContent = "⚠️ เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์";
+    }
+    
+    btn.disabled = false; 
+    btn.textContent = "เข้าสู่ระบบ";
+}
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </body>
