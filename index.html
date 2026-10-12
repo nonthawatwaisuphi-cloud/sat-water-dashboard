@@ -92,19 +92,35 @@ footer{margin-top:4px;padding:12px;border-top:1px solid var(--line)}
 .spark{display:block;width:100%;height:auto;margin-top:2px}
 .lvl{font-size:13px;font-weight:600;color:#fff;border-radius:999px;padding:1px 12px;margin-left:4px}
 .lvl.ok{background:var(--ok)}.lvl.warn{background:#d98e00}.lvl.bad{background:var(--bad)}
+
+/* ===== ระบบล็อกอิน (Login UI) ===== */
+.login-wrap { position:fixed; inset:0; background: linear-gradient(135deg, rgba(11,111,164,0.15), rgba(11,111,164,0.05)), var(--bg); z-index:9999; display:flex; align-items:center; justify-content:center; padding:20px; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+.login-box { background: var(--card); padding: 40px 30px; border-radius: 20px; box-shadow: 0 10px 40px rgba(10,40,70,0.12); width: 100%; max-width: 360px; text-align: center; border: 1px solid var(--line); }
+.login-logo { width: 64px; height: 64px; background: linear-gradient(135deg, #5db7e8, var(--water)); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 32px; margin: 0 auto 16px; box-shadow: 0 4px 12px rgba(11,111,164,0.3); }
+.login-box h2 { color: var(--water); margin: 0 0 6px; font-size: 24px; font-weight: 800; justify-content:center;}
+.login-box h2::before { display: none; } /* ซ่อนขีดหน้า h2 สำหรับกล่องล็อกอิน */
+.login-box p { font-size: 14px; color: var(--mute); margin: 0 0 28px; font-weight: 600; line-height: 1.4; }
+.login-input { width: 100%; padding: 14px 16px; margin-bottom: 14px; border: 2px solid var(--line); border-radius: 12px; font-size: 15px; font-family: inherit; background: var(--bg); color: var(--ink); outline: none; transition: all 0.3s ease; }
+.login-input:focus { border-color: var(--water); background: var(--card); box-shadow: 0 0 0 4px rgba(11,111,164,0.1); }
+.login-input::placeholder { color: #8a9cae; }
+.login-btn { width: 100%; padding: 14px; background: linear-gradient(135deg, #0b6fa4, #0a3a5e); color: #fff; border: none; border-radius: 12px; font-weight: 800; font-size: 16px; font-family: inherit; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 4px 14px rgba(11,111,164,0.25); margin-top: 8px; }
+.login-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(11,111,164,0.35); }
+.login-btn:active { transform: translateY(0); }
+.login-btn:disabled { opacity: 0.7; cursor: wait; transform: none; box-shadow: none; }
 </style>
 </head>
 <body>
 
 <!-- 📌 หน้าต่างล็อกอิน -->
-<div id="loginOverlay" style="position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;align-items:center;justify-content:center;flex-direction:column;padding:20px;">
-  <div style="background:#fff;padding:34px;border-radius:12px;box-shadow:0 4px 20px rgba(11,111,164,0.15);width:100%;max-width:340px;text-align:center;">
-    <h2 style="color:var(--water);margin-bottom:8px;font-size:22px;">🔒 เข้าสู่ระบบ</h2>
-    <p style="font-size:13px;color:var(--mute);margin-bottom:24px;">ระบบติดตามสถานการณ์น้ำ ทีม SAT</p>
-    <input type="text" id="usr" placeholder="ชื่อผู้ใช้ (Username)" style="width:100%;padding:12px;margin-bottom:12px;border:1px solid var(--line);border-radius:8px;font-size:14px;outline:none;">
-    <input type="password" id="pwd" placeholder="รหัสผ่าน (Password)" style="width:100%;padding:12px;margin-bottom:24px;border:1px solid var(--line);border-radius:8px;font-size:14px;outline:none;">
-    <button id="btnLogin" style="width:100%;padding:12px;background:var(--water);color:#fff;border:none;border-radius:8px;font-weight:600;font-size:15px;cursor:pointer;transition:0.2s;">เข้าสู่ระบบ</button>
-    <div id="loginMsg" style="color:var(--bad);font-size:13px;margin-top:14px;font-weight:600;"></div>
+<div id="loginOverlay" class="login-wrap">
+  <div class="login-box">
+    <div class="login-logo">🌊</div>
+    <h2>เข้าสู่ระบบ</h2>
+    <p>ระบบติดตามสถานการณ์น้ำ<br>ศูนย์ปฏิบัติการฉุกเฉิน (SAT)</p>
+    <input type="text" id="usr" class="login-input" placeholder="ชื่อผู้ใช้ (Username)" autocomplete="off">
+    <input type="password" id="pwd" class="login-input" placeholder="รหัสผ่าน (Password)">
+    <button id="btnLogin" class="login-btn">เข้าสู่ระบบ</button>
+    <div id="loginMsg" style="color:var(--bad);font-size:13px;margin-top:16px;font-weight:600;min-height:19px;"></div>
   </div>
 </div>
 
