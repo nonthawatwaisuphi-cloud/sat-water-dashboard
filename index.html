@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- รีเฟรชหน้าจออัตโนมัติทุกๆ 15 นาที (900 วินาที) -->
 <meta http-equiv="refresh" content="900">
 <title>สถานการณ์น้ำทีม SAT รพ.พระนครศรีอยุธยา</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;600;800&display=swap" rel="stylesheet">
@@ -12,7 +13,7 @@
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
 body{margin:0;overflow-wrap:break-word;background:var(--bg);color:var(--ink);font-family:'Noto Sans Thai',system-ui,sans-serif;line-height:1.5}
-.wrap{width:100%;max-width:1100px;margin:0 auto;padding:16px;display:none;}
+.wrap{width:100%;max-width:1100px;margin:0 auto;padding:16px;display:none;} 
 .wrap *{min-width:0}
 header{text-align:center;padding:8px 0 16px}
 h1{margin:0;line-height:1.3;font-size:clamp(20px,4.2vw,34px);font-weight:800;color:var(--accent)}
@@ -43,13 +44,26 @@ td{padding:3px 0;border-top:1px solid var(--line)}td:last-child{text-align:right
 .flow-bar-bg { width: 100%; height: 14px; background: var(--line); border-radius: 7px; overflow: hidden; }
 .flow-bar-fill { height: 100%; background: linear-gradient(90deg, #5db7e8, var(--water)); border-radius: 7px; transition: width 0.5s ease; }
 
-/* ===== CSS สำหรับตารางผู้ป่วย ===== */
-.patient-table-wrap { overflow-x: auto; margin-top: 10px; }
-.patient-table { width: 100%; border-collapse: collapse; min-width: 600px; font-size: 14px; text-align: center; }
-.patient-table th, .patient-table td { border: 1px solid var(--line); padding: 10px 8px; }
-.patient-table th { background-color: var(--water); color: #fff; font-weight: 800; position: sticky; top: 0; }
-.patient-table tr:nth-child(even) { background-color: rgba(11,111,164,0.04); }
-.patient-table tr:hover { background-color: rgba(11,111,164,0.1); }
+/* ===== CSS แดชบอร์ดผู้ป่วย (สวยงาม) ===== */
+.pt-card-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 20px; }
+.pt-card { padding: 14px 10px; border-radius: 10px; text-align: center; display: flex; flex-direction: column; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+.pt-card .pt-label { font-size: 13px; font-weight: 600; margin-bottom: 4px; line-height: 1.2; }
+.pt-card .pt-val { font-size: 32px; font-weight: 800; line-height: 1; }
+.pt-card.total { background: var(--water); color: #fff; }
+.pt-card.r-on { background: var(--bad); color: #fff; }
+.pt-card.r-off { background: rgba(217,56,30,0.1); border: 1px solid rgba(217,56,30,0.3); color: var(--bad); }
+.pt-card.y { background: rgba(232,162,0,0.15); border: 1px solid rgba(232,162,0,0.3); color: #b97f00; }
+.pt-card.g { background: rgba(46,158,91,0.15); border: 1px solid rgba(46,158,91,0.3); color: var(--ok); }
+@media(max-width: 768px) { .pt-card-grid { grid-template-columns: repeat(2, 1fr); } .pt-card.total { grid-column: 1 / -1; } }
+
+.pt-sub-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; }
+.pt-sub-box { background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 14px; }
+.pt-sub-box h4 { margin: 0 0 10px 0; font-size: 14px; color: var(--water); font-weight: 800; }
+.pt-table { width: 100%; border-collapse: collapse; font-size: 13px; text-align: left; }
+.pt-table th, .pt-table td { padding: 8px 4px; border-bottom: 1px solid var(--line); }
+.pt-table th { color: var(--mute); font-weight: 600; font-size: 12px; }
+.pt-table tr:last-child td { border-bottom: none; }
+.pt-num { text-align: right; font-weight: 800; color: var(--ink); }
 
 footer{text-align:center;font-size:13px;color:var(--mute);padding:8px}
 a{color:var(--water)}
@@ -183,12 +197,17 @@ footer{margin-top:4px;padding:12px;border-top:1px solid var(--line)}
   </section>
 </div>
 
-<!-- 4) แดชบอร์ดสถานการณ์ผู้ป่วย (ดึงข้อมูล Data มาวาดตาราง) -->
+<!-- 4) แดชบอร์ดสถานการณ์ผู้ป่วย (โฉมใหม่) -->
 <div class="row">
   <section id="patientImageContainer" style="grid-column: 1 / -1;">
-    <h2>รายงานสถานการณ์ผู้ป่วย</h2>
-    <div id="patientImgWrap" style="color:var(--mute); font-size:14px; padding:10px 0;">กำลังโหลดข้อมูล...</div>
-    <div class="src" id="patientSrc">ที่มา: ทีม SAT รพ.พระนครศรีอยุธยา</div>
+    <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:12px;">
+        <h2>รายงานสถานการณ์ผู้ป่วย</h2>
+        <span id="patientDate" style="font-size:13px; font-weight:600; color:var(--water); background:rgba(11,111,164,0.1); padding:4px 12px; border-radius:20px;">ข้อมูลวันที่: กำลังโหลด...</span>
+    </div>
+    
+    <div id="patientImgWrap" style="color:var(--mute); font-size:14px; padding:10px 0; text-align:center;">กำลังประมวลผลข้อมูล...</div>
+    
+    <div class="src" id="patientSrc" style="margin-top:16px;">ที่มา: ระบบข้อมูล IT ทีม SAT รพ.พระนครศรีอยุธยา</div>
   </section>
 </div>
 
@@ -199,7 +218,7 @@ footer{margin-top:4px;padding:12px;border-top:1px solid var(--line)}
 /* ===== ตั้งค่า ===== */
 const PROVINCE = "พระนครศรีอยุธยา";
 // ⚠️ ห้ามลืม! แทนที่ URL นี้ด้วย URL Web App ของคุณ
-const PROXY = "https://script.google.com/macros/s/AKfycbypV_zZOxuxx2ZzOFQxyb15p8JxGMgDf6dI0v8H5Wh6qgEKsPxyCsswv-NCmyzvJBp9YQ/exec";
+const PROXY = "https://script.google.com/macros/s/AKfycbwfJ1lk6akFyoVWWIP6YQSA91F9f2HbW5dRm41GnHfJrKlU52JSaa4cIqphMafr00TPYw/exec";
 
 /* ===== ข้อมูล Dummy ระหว่างรอ API ===== */
 const DATA = {
@@ -298,7 +317,7 @@ async function refreshAllData() {
         showMsg("ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้ กำลังลองใหม่...");
     }
     
-    // 📌 ดึงตารางผู้ป่วยแยกต่างหาก
+    // 📌 ดึงข้อมูลตารางผู้ป่วยมาวาดเป็น UI ใหม่
     fetchPatientTable();
 }
 
@@ -369,37 +388,99 @@ function updateImage(img){
     };
 }
 
-// 📌 ฟังก์ชันดึง "ข้อมูล Data" มาวาดเป็นตาราง HTML
+// 📌 ฟังก์ชันอ่าน Data ดิบ แล้ววาดเป็น Dashboard Cards สุดสวย
 async function fetchPatientTable() {
     try {
         const res = await fetch(PROXY + "?route=patient");
         const data = await res.json();
         
-        if (data && data.tableData && data.tableData.length > 0) {
-            let html = '<div class="patient-table-wrap"><table class="patient-table">';
+        if (data && data.tableData && data.tableData.length > 5) {
+            const rows = data.tableData;
             
-            // วนลูปอ่านข้อมูลทีละแถว
-            data.tableData.forEach((row, rowIndex) => {
-                // เช็กว่าแถวนี้ว่างเปล่าทั้งหมดหรือไม่ (ถ้าว่างให้ข้ามไป จะได้ตารางไม่โหว่)
-                const isEmptyRow = row.every(cell => cell.trim() === "");
-                if (isEmptyRow) return;
-
-                html += '<tr>';
-                row.forEach(cell => {
-                    // สมมติให้แถวแรก (rowIndex === 0) เป็นหัวตาราง (th)
-                    if (rowIndex === 0) {
-                        html += `<th>${cell}</th>`;
-                    } else {
-                        html += `<td>${cell}</td>`;
-                    }
-                });
-                html += '</tr>';
-            });
+            // 1) ดึงค่ายอดสรุป
+            const reportDate = rows[1][1] || "-";
+            const total = rows[3][0] || "0";
+            const redOn = rows[3][2] || "0";
+            const redNo = rows[3][4] || "0";
+            const yellow = rows[3][6] || "0";
+            const green = rows[3][8] || "0";
             
-            html += '</table></div>';
+            document.getElementById("patientDate").textContent = `ข้อมูลวันที่: ${reportDate}`;
+            
+            // 2) สร้างโครงสร้าง HTML สำหรับ Dashboard
+            let html = `
+            <!-- การ์ดยอดสรุป -->
+            <div class="pt-card-grid">
+                <div class="pt-card total">
+                    <div class="pt-label">ผู้ป่วยคงเหลือ</div>
+                    <div class="pt-val">${total}</div>
+                </div>
+                <div class="pt-card r-on">
+                    <div class="pt-label">แดง On ET Tube</div>
+                    <div class="pt-val">${redOn}</div>
+                </div>
+                <div class="pt-card r-off">
+                    <div class="pt-label">แดง No ET Tube</div>
+                    <div class="pt-val">${redNo}</div>
+                </div>
+                <div class="pt-card y">
+                    <div class="pt-label">เหลือง (2,1)</div>
+                    <div class="pt-val">${yellow}</div>
+                </div>
+                <div class="pt-card g">
+                    <div class="pt-label">เขียว</div>
+                    <div class="pt-val">${green}</div>
+                </div>
+            </div>
+            
+            <!-- ตารางย่อย 3 ตาราง -->
+            <div class="pt-sub-grid">
+            `;
+            
+            // ตารางที่ 1: ผู้ป่วยแต่ละประเภท
+            html += `<div class="pt-sub-box">
+                        <h4>1) ผู้ป่วยแต่ละประเภท</h4>
+                        <table class="pt-table">
+                            <thead><tr><th>ประเภทผู้ป่วย</th><th style="text-align:right">จำนวน (ราย)</th></tr></thead>
+                            <tbody>`;
+            for(let i=6; i<rows.length; i++) {
+                if(rows[i][0] && rows[i][0].trim() !== "") {
+                    html += `<tr><td>${rows[i][0]}</td><td class="pt-num">${rows[i][1]}</td></tr>`;
+                }
+            }
+            html += `       </tbody></table></div>`;
+            
+            // ตารางที่ 2: ทรัพยากร
+            html += `<div class="pt-sub-box">
+                        <h4>2) ทรัพยากรที่ต้องการ</h4>
+                        <table class="pt-table">
+                            <thead><tr><th>ทรัพยากร</th><th style="text-align:right">จำนวน</th></tr></thead>
+                            <tbody>`;
+            for(let i=6; i<rows.length; i++) {
+                if(rows[i][4] && rows[i][4].trim() !== "") {
+                    html += `<tr><td>${rows[i][4]}</td><td class="pt-num">${rows[i][5]}</td></tr>`;
+                }
+            }
+            html += `       </tbody></table></div>`;
+            
+            // ตารางที่ 3: 5 อันดับ
+            html += `<div class="pt-sub-box">
+                        <h4>3) 5 อันดับ WARD ผู้ป่วยแดง (On ET)</h4>
+                        <table class="pt-table">
+                            <thead><tr><th style="text-align:center">อันดับ</th><th>หน่วยงาน</th><th style="text-align:right">จำนวน (ราย)</th></tr></thead>
+                            <tbody>`;
+            for(let i=6; i<rows.length; i++) {
+                if(rows[i][7] && rows[i][7].trim() !== "") {
+                    html += `<tr><td style="text-align:center; color:var(--mute);">${rows[i][7]}</td><td>${rows[i][8]}</td><td class="pt-num">${rows[i][9]}</td></tr>`;
+                }
+            }
+            html += `       </tbody></table></div>`;
+            
+            html += `</div>`; // ปิด pt-sub-grid
             
             document.getElementById("patientImgWrap").innerHTML = html;
-            document.getElementById("patientSrc").innerHTML = "อัปเดตล่าสุด: " + data.update;
+            document.getElementById("patientSrc").innerHTML = "อัปเดตล่าสุด: " + data.update + " · ระบบข้อมูล IT ทีม SAT รพ.พระนครศรีอยุธยา";
+            
         } else {
             document.getElementById("patientImgWrap").innerHTML = "ไม่พบข้อมูลตารางผู้ป่วยในระบบ (หรือเกิดข้อผิดพลาด)";
         }
