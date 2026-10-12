@@ -235,6 +235,19 @@ footer{margin-top:4px;padding:12px;border-top:1px solid var(--line)}
 .login-box.shake{animation:lsShake .45s ease}
 @keyframes lsShake{10%,90%{transform:translateX(-2px)}20%,80%{transform:translateX(4px)}30%,50%,70%{transform:translateX(-7px)}40%,60%{transform:translateX(7px)}}
 
+
+/* ===== แจ้งล็อกอินไม่สำเร็จ (เต็มกล่อง แล้วกลับไปฟอร์มเอง) ===== */
+.login-box.fail h2,.login-box.fail>p,.login-box.fail .login-input,.login-box.fail .login-btn,.login-box.fail #loginMsg{display:none}
+.login-box.fail .login-fail{display:flex}
+.login-box.fail .login-logo{margin-bottom:20px}
+.login-fail{display:none;flex-direction:column;align-items:center;gap:6px;padding:4px 0 6px}
+.login-fail .chk{width:72px;height:72px;margin-bottom:8px;animation:lsPop .5s cubic-bezier(.2,1.4,.4,1) both}
+.login-fail .chk circle{fill:rgba(217,56,30,.1);stroke:var(--bad);stroke-width:3;stroke-dasharray:151;stroke-dashoffset:151;animation:lsDraw .6s ease-out .05s forwards}
+.login-fail .chk path{fill:none;stroke:var(--bad);stroke-width:4;stroke-linecap:round;stroke-dasharray:50;stroke-dashoffset:50;animation:lsDraw .4s ease-out .5s forwards}
+.login-fail .ls-t{color:var(--bad)}
+.login-fail .ls-bar i{width:100%;background:linear-gradient(90deg,#f08a74,var(--bad));animation:lsDrain 2.6s linear forwards}
+@keyframes lsDrain{to{width:0}}
+
 /* ===== ระบบล็อกอิน (Login UI) ===== */
 .login-wrap { position:fixed; inset:0; background: linear-gradient(135deg, rgba(11,111,164,0.15), rgba(11,111,164,0.05)), var(--bg); z-index:9999; display:flex; align-items:center; justify-content:center; padding:20px; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
 .login-box { background: var(--card); padding: 40px 30px; border-radius: 20px; box-shadow: 0 10px 40px rgba(10,40,70,0.12); width: 100%; max-width: 360px; text-align: center; border: 1px solid var(--line); }
@@ -269,6 +282,12 @@ footer{margin-top:4px;padding:12px;border-top:1px solid var(--line)}
       <svg class="chk" viewBox="0 0 52 52" aria-hidden="true"><circle cx="26" cy="26" r="24"/><path d="M14 27l8 8 16-17"/></svg>
       <div class="ls-t">ล็อกอินสำเร็จ</div>
       <div class="ls-s">กำลังเข้าสู่ระบบ SAT<span class="dots"></span></div>
+      <div class="ls-bar"><i></i></div>
+    </div>
+    <div id="loginFail" class="login-fail" role="alert">
+      <svg class="chk" viewBox="0 0 52 52" aria-hidden="true"><circle cx="26" cy="26" r="24"/><path d="M17 17l18 18M35 17L17 35"/></svg>
+      <div class="ls-t">ล็อกอินไม่สำเร็จ</div>
+      <div class="ls-s" id="failSub">ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง</div>
       <div class="ls-bar"><i></i></div>
     </div>
   </div>
@@ -702,7 +721,8 @@ document.getElementById("btnLogout").addEventListener("click", () => {
     clearTimeout(loginMsgTimer);
     document.getElementById("loginMsg").textContent = "";
     document.getElementById("loginMsg").classList.remove("show");
-    document.querySelector(".login-box").classList.remove("ok");
+    clearTimeout(loginFailTimer);
+    document.querySelector(".login-box").classList.remove("ok","fail");
 });
 
 document.getElementById("btnLogin").addEventListener("click", performLogin);
@@ -733,6 +753,23 @@ function flashLoginMsg(text, shake){
     }, 3000);
 }
 
+let loginFailTimer;
+function showLoginFail(sub){
+    const box = document.querySelector(".login-box");
+    document.getElementById("failSub").textContent = sub;
+    clearTimeout(loginMsgTimer);
+    document.getElementById("loginMsg").textContent = "";
+    box.classList.add("fail");
+    box.classList.remove("shake"); void box.offsetWidth; box.classList.add("shake");
+    box.addEventListener("animationend", e => { if (e.target === box) box.classList.remove("shake"); }, {once:true});
+    clearTimeout(loginFailTimer);
+    loginFailTimer = setTimeout(() => {          // แสดงราว 2.6 วินาที แล้วกลับไปหน้าฟอร์ม
+        box.classList.remove("fail");
+        const pwd = document.getElementById("pwd");
+        pwd.value = ""; pwd.focus();
+    }, 2600);
+}
+
 async function performLogin() {
     const u = document.getElementById("usr").value;
     const p = document.getElementById("pwd").value;
@@ -752,10 +789,10 @@ async function performLogin() {
                 document.getElementById("mainDashboard").style.display = "block";
             }, 1800);
         } else {
-            flashLoginMsg("❌ ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง", true);
+            showLoginFail("ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง");
         }
     } catch(e) {
-        flashLoginMsg("⚠️ เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์");
+        showLoginFail("เชื่อมต่อเซิร์ฟเวอร์ไม่ได้ กรุณาลองใหม่อีกครั้ง");
     }
     btn.disabled = false; btn.textContent = "เข้าสู่ระบบ";
 }
