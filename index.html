@@ -43,14 +43,6 @@ td{padding:3px 0;border-top:1px solid var(--line)}td:last-child{text-align:right
 .flow-bar-bg { width: 100%; height: 14px; background: var(--line); border-radius: 7px; overflow: hidden; }
 .flow-bar-fill { height: 100%; background: linear-gradient(90deg, #5db7e8, var(--water)); border-radius: 7px; transition: width 0.5s ease; }
 
-/* ===== CSS สำหรับตารางผู้ป่วย ===== */
-.patient-table-wrap { overflow-x: auto; margin-top: 10px; }
-.patient-table { width: 100%; border-collapse: collapse; min-width: 600px; font-size: 14px; text-align: center; }
-.patient-table th, .patient-table td { border: 1px solid var(--line); padding: 10px 8px; }
-.patient-table th { background-color: var(--water); color: #fff; font-weight: 800; position: sticky; top: 0; }
-.patient-table tr:nth-child(even) { background-color: rgba(11,111,164,0.04); }
-.patient-table tr:hover { background-color: rgba(11,111,164,0.1); }
-
 footer{text-align:center;font-size:13px;color:var(--mute);padding:8px}
 a{color:var(--water)}
 
@@ -107,6 +99,51 @@ footer{margin-top:4px;padding:12px;border-top:1px solid var(--line)}
 .spark{display:block;width:100%;height:auto;margin-top:2px}
 .lvl{font-size:13px;font-weight:600;color:#fff;border-radius:999px;padding:1px 12px;margin-left:4px}
 .lvl.ok{background:var(--ok)}.lvl.warn{background:#d98e00}.lvl.bad{background:var(--bad)}
+
+/* ===== รายงานสถานการณ์ผู้ป่วย (ใหม่) ===== */
+.pt-meta{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:14px}
+.chip{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;border-radius:999px;padding:3px 12px;background:rgba(11,111,164,.1);color:var(--water)}
+.chip.test{background:rgba(232,162,0,.16);color:#a06c00}
+.pt-grid{display:grid;grid-template-columns:minmax(180px,1.1fr) repeat(4,minmax(120px,1fr));gap:12px}
+@media(max-width:900px){.pt-grid{grid-template-columns:repeat(2,1fr)}.pt-total{grid-column:1/-1}}
+.pt-card{position:relative;border:1px solid var(--line);border-radius:12px;padding:14px 14px 12px;background:var(--card);overflow:hidden;display:flex;flex-direction:column;gap:2px}
+.pt-card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--c,var(--water))}
+.pt-card .lb{font-size:13px;font-weight:600;color:var(--mute);line-height:1.3;min-height:2.6em}
+.pt-card .nm{font-size:38px;font-weight:800;line-height:1.1;color:var(--c,var(--water))}
+.pt-card .nm small{font-size:13px;font-weight:600;color:var(--mute);margin-left:4px}
+.pt-card .pc{font-size:12px;color:var(--mute);font-weight:600}
+.pt-card .mini{height:6px;border-radius:3px;background:var(--line);overflow:hidden;margin-top:6px}
+.pt-card .mini i{display:block;height:100%;background:var(--c,var(--water));border-radius:3px}
+.pt-total{background:linear-gradient(135deg,#0a3a5e,#0b6fa4);color:#fff;border:0}
+.pt-total::before{display:none}
+.pt-total .lb{color:rgba(255,255,255,.85)}
+.pt-total .nm{color:#fff;font-size:48px}
+.pt-total .nm small{color:rgba(255,255,255,.85)}
+.pt-total .pc{color:rgba(255,255,255,.8)}
+.stack{display:flex;height:16px;border-radius:8px;overflow:hidden;margin:16px 0 6px;background:var(--line)}
+.stack i{display:block;height:100%}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:12px;color:var(--mute);margin-bottom:16px}
+.legend span::before{content:"";display:inline-block;width:10px;height:10px;border-radius:3px;background:var(--c);margin-right:6px;vertical-align:-1px}
+.pt-two{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:14px}
+.pt-panel{border:1px solid var(--line);border-radius:12px;padding:14px}
+.pt-panel h3{margin:0 0 12px;font-size:15px;font-weight:800;color:var(--ink)}
+.res{display:flex;flex-direction:column;gap:11px}
+.res-row .top{display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-size:14px;font-weight:600;margin-bottom:4px}
+.res-row .top b{font-size:17px;font-weight:800;color:var(--water)}
+.res-row .bar{height:10px;border-radius:5px;background:var(--line);overflow:hidden}
+.res-row .bar i{display:block;height:100%;border-radius:5px;background:linear-gradient(90deg,#5db7e8,var(--water))}
+.res-row.pall .top b{color:var(--mute)}
+.res-row.pall .bar i{background:linear-gradient(90deg,#b8c4d0,#8496a8)}
+.rank{display:flex;flex-direction:column;gap:8px}
+.rank-row{display:flex;align-items:center;gap:12px;border:1px solid var(--line);border-radius:10px;padding:8px 12px}
+.rank-no{flex:none;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;color:#fff;background:#8496a8}
+.rank-row:nth-child(1) .rank-no{background:#c8102e}
+.rank-row:nth-child(2) .rank-no{background:#e8553d}
+.rank-row:nth-child(3) .rank-no{background:#e8a200}
+.rank-nm{flex:1;font-weight:600;font-size:14px}
+.rank-ct{font-weight:800;color:var(--water);font-size:16px}
+.rank-ct small{font-size:11px;font-weight:600;color:var(--mute);margin-left:3px}
+.empty{color:var(--mute);font-size:14px;text-align:center;padding:22px 8px;border:1px dashed var(--line);border-radius:10px}
 
 /* ===== ระบบล็อกอิน (Login UI) ===== */
 .login-wrap { position:fixed; inset:0; background: linear-gradient(135deg, rgba(11,111,164,0.15), rgba(11,111,164,0.05)), var(--bg); z-index:9999; display:flex; align-items:center; justify-content:center; padding:20px; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
@@ -183,7 +220,7 @@ footer{margin-top:4px;padding:12px;border-top:1px solid var(--line)}
   </section>
 </div>
 
-<!-- 4) แดชบอร์ดสถานการณ์ผู้ป่วย (ดึงข้อมูล Data มาวาดตาราง) -->
+<!-- 4) รายงานสถานการณ์ผู้ป่วย -->
 <div class="row">
   <section id="patientImageContainer" style="grid-column: 1 / -1;">
     <h2>รายงานสถานการณ์ผู้ป่วย</h2>
@@ -247,6 +284,7 @@ function spark(s,cls){
 }
 const grade = d => d<0?["bad","ล้นตลิ่ง"]:d<0.5?["bad","ใกล้ตลิ่งมาก"]:d<1?["warn","เฝ้าระวัง"]:["ok","ยังห่างตลิ่ง"];
 const num = x => Number(String(x).replace(/,/g,""));
+const esc = s => String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 
 function drawStations(){
   if(DATA.stations.length === 0) return;
@@ -298,7 +336,7 @@ async function refreshAllData() {
         showMsg("ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้ กำลังลองใหม่...");
     }
     
-    // 📌 ดึงตารางผู้ป่วยแยกต่างหาก
+    // 📌 ดึงรายงานผู้ป่วยแยกต่างหาก
     fetchPatientTable();
 }
 
@@ -369,43 +407,102 @@ function updateImage(img){
     };
 }
 
-// 📌 ฟังก์ชันดึง "ข้อมูล Data" มาวาดเป็นตาราง HTML
+/* ===== รายงานสถานการณ์ผู้ป่วย: แปลงตารางดิบ → การ์ด/กราฟ ===== */
+function renderPatient(tableData){
+  // ตัดแถวว่างทิ้ง แล้วหาข้อมูลจาก "ข้อความในแถว" (ไม่พึ่งเลขแถวตายตัว)
+  const rows = tableData.map(r => r.map(c => String(c==null?"":c).trim())).filter(r => r.some(c => c !== ""));
+  const toN = v => { const n = Number(String(v).replace(/,/g,"")); return isNaN(n) ? 0 : n; };
+  const findRow = (kw, from=0) => { for(let i=from;i<rows.length;i++) if(rows[i].some(c=>c.includes(kw))) return i; return -1; };
+
+  // หัวเรื่อง/วันที่
+  const testNote = rows[0] && rows[0][0].includes("ทดสอบ") ? rows[0][0].replace(/\*+/g,"").replace(/\s+/g," ").trim() : "";
+  const dI = findRow("ข้อมูลวันที่");
+  const dateTxt = dI >= 0 ? (rows[dI].slice(1).find(c=>c!=="") || "") : "";
+
+  // 1) ผู้ป่วยคงเหลือ + 4 ประเภท
+  const lI = findRow("ผู้ป่วยคงเหลือ");
+  let total = 0, cats = [];
+  if(lI >= 0 && rows[lI+1]){
+    const lab = rows[lI], cnt = rows[lI+1];
+    total = toN(cnt[0]);
+    for(let c=1;c<lab.length;c++){
+      if(!lab[c]) continue;
+      const L = lab[c];
+      const color = L.includes("On ET") ? "#a30d24" : L.includes("No ET") ? "#e8553d" : L.includes("เหลือง") ? "#e8a200" : L.includes("เขียว") ? "#2e9e5b" : "#0b6fa4";
+      cats.push({label:L, n:toN(cnt[c]), color});
+    }
+    if(!total) total = cats.reduce((a,b)=>a+b.n,0);
+  }
+
+  // 2) ทรัพยากร + 3) อันดับหน่วยงาน (อ่านจากแถวหัวตาราง)
+  const hI = findRow("ประเภทผู้ป่วย");
+  let res = [], rank = [];
+  if(hI >= 0){
+    const hd = rows[hI];
+    const resCol = hd.findIndex(c=>c.includes("ทรัพยากร"));
+    const rankCol = hd.findIndex(c=>c.includes("อันดับ"));
+    const unitCol = hd.findIndex(c=>c.includes("หน่วยงาน"));
+    let cntCol = -1; hd.forEach((c,i)=>{ if(c.includes("จำนวน") && i>unitCol) cntCol=i; });
+    for(let i=hI+1;i<rows.length;i++){
+      const r = rows[i];
+      if(resCol>=0 && r[resCol]) res.push({name:r[resCol], n:toN(r[resCol+1])});
+      if(rankCol>=0 && unitCol>=0 && r[unitCol]) rank.push({no:r[rankCol]||String(rank.length+1), unit:r[unitCol], n:cntCol>=0?toN(r[cntCol]):0});
+    }
+  }
+
+  if(!cats.length && !res.length) return null;
+
+  const pct = n => total>0 ? (n/total*100) : 0;
+  const maxRes = Math.max(1,...res.map(r=>r.n));
+
+  let h = `<div class="pt-meta">
+    ${dateTxt?`<span class="chip">📅 ข้อมูลวันที่ ${esc(dateTxt)}</span>`:""}
+    ${testNote?`<span class="chip test">⚠️ ${esc(testNote)}</span>`:""}
+  </div>`;
+
+  h += `<div class="pt-grid">
+    <div class="pt-card pt-total"><div class="lb">ผู้ป่วยคงเหลือทั้งหมด</div><div class="nm">${total.toLocaleString()}<small>ราย</small></div><div class="pc">รวมทุกประเภท</div></div>
+    ${cats.map(c=>`<div class="pt-card" style="--c:${c.color}">
+      <div class="lb">${esc(c.label)}</div>
+      <div class="nm">${c.n.toLocaleString()}<small>ราย</small></div>
+      <div class="pc">${pct(c.n).toFixed(1)}% ของทั้งหมด</div>
+      <div class="mini"><i style="width:${pct(c.n)}%"></i></div></div>`).join("")}
+  </div>`;
+
+  if(total>0 && cats.length){
+    h += `<div class="stack" role="img" aria-label="สัดส่วนผู้ป่วยแต่ละประเภท">${cats.map(c=>`<i style="width:${pct(c.n)}%;background:${c.color}" title="${esc(c.label)} ${c.n}"></i>`).join("")}</div>
+    <div class="legend">${cats.map(c=>`<span style="--c:${c.color}">${esc(c.label)}</span>`).join("")}</div>`;
+  }
+
+  h += `<div class="pt-two">`;
+  h += `<div class="pt-panel"><h3>🫁 ทรัพยากรที่ต้องการ</h3>`;
+  h += res.length ? `<div class="res">${res.map(r=>`<div class="res-row${/palliative/i.test(r.name)?" pall":""}">
+      <div class="top"><span>${esc(r.name)}</span><span><b>${r.n.toLocaleString()}</b></span></div>
+      <div class="bar"><i style="width:${r.n/maxRes*100}%"></i></div></div>`).join("")}</div>` : `<div class="empty">ไม่มีข้อมูลทรัพยากร</div>`;
+  h += `</div>`;
+
+  h += `<div class="pt-panel"><h3>🏥 5 อันดับหน่วยงานที่มีผู้ป่วยแดง (5,4) On ET Tube</h3>`;
+  h += rank.length ? `<div class="rank">${rank.map(r=>`<div class="rank-row"><span class="rank-no">${esc(r.no)}</span><span class="rank-nm">${esc(r.unit)}</span><span class="rank-ct">${r.n.toLocaleString()}<small>ราย</small></span></div>`).join("")}</div>` : `<div class="empty">ยังไม่มีข้อมูลหน่วยงาน</div>`;
+  h += `</div></div>`;
+  return h;
+}
+
 async function fetchPatientTable() {
+    const wrap = document.getElementById("patientImgWrap");
     try {
         const res = await fetch(PROXY + "?route=patient");
         const data = await res.json();
-        
-        if (data && data.tableData && data.tableData.length > 0) {
-            let html = '<div class="patient-table-wrap"><table class="patient-table">';
-            
-            // วนลูปอ่านข้อมูลทีละแถว
-            data.tableData.forEach((row, rowIndex) => {
-                // เช็กว่าแถวนี้ว่างเปล่าทั้งหมดหรือไม่ (ถ้าว่างให้ข้ามไป จะได้ตารางไม่โหว่)
-                const isEmptyRow = row.every(cell => cell.trim() === "");
-                if (isEmptyRow) return;
-
-                html += '<tr>';
-                row.forEach(cell => {
-                    // สมมติให้แถวแรก (rowIndex === 0) เป็นหัวตาราง (th)
-                    if (rowIndex === 0) {
-                        html += `<th>${cell}</th>`;
-                    } else {
-                        html += `<td>${cell}</td>`;
-                    }
-                });
-                html += '</tr>';
-            });
-            
-            html += '</table></div>';
-            
-            document.getElementById("patientImgWrap").innerHTML = html;
-            document.getElementById("patientSrc").innerHTML = "อัปเดตล่าสุด: " + data.update;
+        const html = data && data.tableData && data.tableData.length ? renderPatient(data.tableData) : null;
+        if (html) {
+            wrap.style.padding = "0";
+            wrap.innerHTML = html;
+            document.getElementById("patientSrc").textContent = "อัปเดตล่าสุด: " + (data.update || "-") + " · ทีม SAT รพ.พระนครศรีอยุธยา";
         } else {
-            document.getElementById("patientImgWrap").innerHTML = "ไม่พบข้อมูลตารางผู้ป่วยในระบบ (หรือเกิดข้อผิดพลาด)";
+            wrap.innerHTML = `<div class="empty">ไม่พบข้อมูลรายงานผู้ป่วยในระบบ</div>`;
         }
     } catch (err) {
         console.error("Patient Table Error:", err);
-        document.getElementById("patientImgWrap").innerHTML = "เกิดข้อผิดพลาดในการดึงข้อมูล";
+        wrap.innerHTML = `<div class="empty">เกิดข้อผิดพลาดในการดึงข้อมูลผู้ป่วย</div>`;
     }
 }
 
@@ -509,7 +606,7 @@ async function performLogin() {
     if (!u || !p) { msg.textContent = "กรุณากรอกข้อมูลให้ครบถ้วน"; return; }
     btn.disabled = true; btn.textContent = "กำลังตรวจสอบ..."; msg.textContent = "";
     try {
-        const res = await fetch(PROXY + `?route=login&user=${u}&pass=${p}`);
+        const res = await fetch(PROXY + `?route=login&user=${encodeURIComponent(u)}&pass=${encodeURIComponent(p)}`);
         const data = await res.json();
         if (data.success) {
             localStorage.setItem("sat_auth_time", Date.now().toString());
