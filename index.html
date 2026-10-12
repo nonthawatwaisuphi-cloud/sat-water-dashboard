@@ -92,7 +92,6 @@ footer{margin-top:4px;padding:12px;border-top:1px solid var(--line)}
   .hd{padding:14px}
   .hd-actions { width: 100%; flex-direction: column; }
   #savePng, #btnLogout { width: 100%; }
-  .hero b{font-size:30px}
 }
 @media print{#savePng, #btnLogout{display:none}body{background:#fff}section{box-shadow:none;break-inside:avoid}}
 
@@ -105,7 +104,10 @@ footer{margin-top:4px;padding:12px;border-top:1px solid var(--line)}
 /* ===== ระบบล็อกอิน (Login UI) ===== */
 .login-wrap { position:fixed; inset:0; background: linear-gradient(135deg, rgba(11,111,164,0.15), rgba(11,111,164,0.05)), var(--bg); z-index:9999; display:flex; align-items:center; justify-content:center; padding:20px; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
 .login-box { background: var(--card); padding: 40px 30px; border-radius: 20px; box-shadow: 0 10px 40px rgba(10,40,70,0.12); width: 100%; max-width: 360px; text-align: center; border: 1px solid var(--line); }
-.login-logo { width: 64px; height: 64px; background: linear-gradient(135deg, #5db7e8, var(--water)); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 32px; margin: 0 auto 16px; box-shadow: 0 4px 12px rgba(11,111,164,0.3); }
+
+/* เปลี่ยนขนาดกรอบโลโก้ให้พอดีรูป */
+.login-logo { width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; background: #fff; box-shadow: 0 4px 12px rgba(11,111,164,0.15); overflow: hidden; border: 2px solid var(--line); }
+
 .login-box h2 { color: var(--water); margin: 0 0 6px; font-size: 24px; font-weight: 800; justify-content:center;}
 .login-box h2::before { display: none; } /* ซ่อนขีดหน้า h2 สำหรับกล่องล็อกอิน */
 .login-box p { font-size: 14px; color: var(--mute); margin: 0 0 28px; font-weight: 600; line-height: 1.4; }
@@ -123,7 +125,11 @@ footer{margin-top:4px;padding:12px;border-top:1px solid var(--line)}
 <!-- 📌 หน้าต่างล็อกอิน -->
 <div id="loginOverlay" class="login-wrap">
   <div class="login-box">
-    <div class="login-logo">🌊</div>
+    <div class="login-logo">
+      <!-- 📌 ใช้โลโก้กระทรวงสาธารณสุขแทนอิโมจิคลื่น -->
+      <!-- หากมีลิงก์รูป รพ.พระนครศรีอยุธยา ให้นำมาเปลี่ยนที่ src="" ได้เลยครับ -->
+      <img src="https://upload.wikimedia.org/wikipedia/th/f/fe/Moph.png" alt="โลโก้โรงพยาบาล" style="width: 100%; height: 100%; object-fit: contain; padding: 4px;">
+    </div>
     <h2>เข้าสู่ระบบ</h2>
     <p>ระบบติดตามสถานการณ์น้ำ<br>ศูนย์ปฏิบัติการฉุกเฉิน (SAT)</p>
     <input type="text" id="usr" class="login-input" placeholder="ชื่อผู้ใช้ (Username)" autocomplete="off">
@@ -139,7 +145,6 @@ footer{margin-top:4px;padding:12px;border-top:1px solid var(--line)}
     <h1>สถานการณ์น้ำทีม SAT รพ.พระนครศรีอยุธยา</h1>
     <p id="today">วันที่ ...</p>
   </div>
-  <!-- 📌 ปุ่มการกระทำ Header (เซฟรูป + ออกจากระบบ) -->
   <div class="hd-actions">
     <button id="savePng" data-html2canvas-ignore="true">💾 บันทึกเป็นภาพ PNG</button>
     <button id="btnLogout" data-html2canvas-ignore="true">🚪 ออกจากระบบ</button>
@@ -161,7 +166,7 @@ footer{margin-top:4px;padding:12px;border-top:1px solid var(--line)}
   <div class="src" id="stsrc"></div>
 </section>
 
-<!-- 3) เจ้าพระยา & แผนภาพ -->
+<!-- 3) เจ้าพระยา & แผนภาพน้ำ -->
 <div class="row">
   <section>
     <h2>แม่น้ำเจ้าพระยา (กรมชลประทาน)</h2>
@@ -176,6 +181,15 @@ footer{margin-top:4px;padding:12px;border-top:1px solid var(--line)}
   </section>
 </div>
 
+<!-- 4) แดชบอร์ดสถานการณ์ผู้ป่วย (ดึงจาก Sheet) -->
+<div class="row">
+  <section id="patientImageContainer" style="grid-column: 1 / -1;">
+    <h2>รายงานสถานการณ์ผู้ป่วย</h2>
+    <div id="patientImgWrap" style="text-align:center; color:var(--mute); font-size:14px; padding:10px 0;">กำลังโหลดภาพ...</div>
+    <div class="src" id="patientSrc">ที่มา: ทีม SAT รพ.พระนครศรีอยุธยา</div>
+  </section>
+</div>
+
 <footer>จัดทำโดย ภารกิจสุขภาพดิจิทัล โรงพยาบาลพระนครศรีอยุธยา</footer>
 </div>
 
@@ -183,7 +197,7 @@ footer{margin-top:4px;padding:12px;border-top:1px solid var(--line)}
 /* ===== ตั้งค่า ===== */
 const PROVINCE = "พระนครศรีอยุธยา";
 // ⚠️ ห้ามลืม! แทนที่ URL นี้ด้วย URL Web App ของคุณ
-const PROXY = "https://script.google.com/macros/s/AKfycbwfJ1lk6akFyoVWWIP6YQSA91F9f2HbW5dRm41GnHfJrKlU52JSaa4cIqphMafr00TPYw/exec";
+const PROXY = "https://script.google.com/macros/s/AKfycbwSieRwQMAO-nalO7Esfnk35-lmkoHGAYKQ16tf5PRw72dHmZPFFX3VHQhv9PcU0Sb2LQ/exec";
 
 /* ===== ข้อมูล Dummy ระหว่างรอ API ===== */
 const DATA = {
@@ -197,14 +211,12 @@ const DATA = {
   flow: []
 };
 
-/* ===== แสดงวันที่ปัจจุบัน ===== */
 function updateTodayDate() {
   const th = new Date().toLocaleDateString("th-TH",{day:"numeric",month:"long",year:"numeric"});
   document.getElementById("today").textContent = "วันที่ " + th;
 }
 updateTodayDate();
 
-/* ===== วาดองค์ประกอบระดับน้ำ ===== */
 const COL = {ok:"#0b6fa4",warn:"#d98e00",bad:"#d9381e"};
 function trendOf(h){
   const n=h.length, d=Math.round((h[n-1]-h[Math.max(0,n-3)])*100)/100, hrs=(Math.min(2,n-1))*DATA.histStep;
@@ -256,7 +268,6 @@ function drawStations(){
   document.getElementById("stsrc").textContent = `ข้อมูลล่าสุด ${DATA.updated} · ศูนย์ข้อมูลน้ำระดับจังหวัด / กรมชลประทาน`;
 }
 
-/* ===== พยากรณ์อากาศ TMD ===== */
 const COND = {1:["☀️","ฟ้าโปร่ง","c-sun"],2:["🌤️","มีเมฆบางส่วน","c-sun"],3:["⛅","เมฆเป็นส่วนมาก","c-cloud"],4:["☁️","เมฆมาก","c-cloud"],5:["🌦️","ฝนตกเล็กน้อย","c-rain"],6:["🌧️","ฝนปานกลาง","c-rain"],7:["⛈️","ฝนหนัก","c-storm"],8:["🌩️","ฝนฟ้าคะนอง","c-storm"],9:["🥶","หนาวจัด","c-cold"],10:["🧥","หนาว","c-cold"],11:["🍃","เย็น","c-cold"],12:["🔥","ร้อนจัด","c-hot"]};
 
 function renderWeather(days, note){
@@ -268,7 +279,6 @@ function renderWeather(days, note){
   document.getElementById("wxsrc").textContent = note;
 }
 
-/* ===== ฟังก์ชันดึงข้อมูลทั้งหมดมารวมกัน ===== */
 async function refreshAllData() {
     updateTodayDate();
     try {
@@ -286,9 +296,11 @@ async function refreshAllData() {
         console.error("Dashboard Error:", err);
         showMsg("ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้ กำลังลองใหม่...");
     }
+    
+    // 📌 ดึงข้อมูลภาพผู้ป่วยแยกต่างหาก
+    fetchPatientImage();
 }
 
-/* ===== อัปเดต UI แต่ละส่วน ===== */
 function updateWeather(weather){
     if(!weather || !weather.WeatherForecasts) return;
     const days = weather.WeatherForecasts[0].forecasts;
@@ -304,10 +316,9 @@ function updateWeather(weather){
 
 function updateWater(w){
     if(!w || w.error || !w.stations || w.stations.length === 0) {
-        document.getElementById("sum").innerHTML = `<span style="color:var(--bad)">⚠️ ไม่สามารถดึงข้อมูลระดับน้ำได้ในขณะนี้ (เซิร์ฟเวอร์ ThaiWater อาจขัดข้อง)</span>`;
+        document.getElementById("sum").innerHTML = `<span style="color:var(--bad)">⚠️ ไม่สามารถดึงข้อมูลระดับน้ำได้ในขณะนี้</span>`;
         return;
     }
-    
     DATA.updated = w.update;
     DATA.stations = w.stations.map(s=>({
         name:s.name, code:s.code, level:parseFloat(s.level).toFixed(2), bank:s.bank, bed:s.ground, diff:parseFloat(s.diff).toFixed(2),
@@ -318,15 +329,10 @@ function updateWater(w){
 
 function updateFlow(flow){
     if(!flow || !flow.data) return;
-    
-    // หาค่าปริมาณน้ำที่เยอะที่สุด เพื่อนำมาใช้เป็น 100% ของความยาวกราฟ
     const maxFlow = Math.max(...flow.data.map(f => Number(f.flow.toString().replace(/,/g, ""))));
-    
     document.getElementById("flow").innerHTML = flow.data.map(f => {
         const val = Number(f.flow.toString().replace(/,/g, ""));
-        // คำนวณเปอร์เซ็นต์ความยาวของแท่งกราฟ
         const pct = maxFlow > 0 ? (val / maxFlow) * 100 : 0;
-        
         return `
         <div class="flow-item">
             <div class="flow-label">
@@ -347,7 +353,6 @@ function updateImage(img){
     }
     const wrap = document.getElementById("ridImgWrap");
     wrap.innerHTML = `<img id="ridImg" crossorigin="anonymous" alt="แผนภาพสถานการณ์น้ำ" style="width:100%; display:block; border-radius:10px; border:1px solid var(--line); margin-top:4px">`;
-    
     const image = document.getElementById("ridImg");
     if (img.image.startsWith("data:")) {
         image.src = img.image;
@@ -363,7 +368,25 @@ function updateImage(img){
     };
 }
 
-/* ===== บันทึกเป็นภาพ ===== */
+// 📌 ฟังก์ชันดึงรูปภาพผู้ป่วยจาก Google Sheets
+async function fetchPatientImage() {
+    try {
+        const res = await fetch(PROXY + "?route=patient");
+        const data = await res.json();
+        if (data && data.url) {
+            const wrap = document.getElementById("patientImgWrap");
+            wrap.innerHTML = `<img id="patientImg" crossorigin="anonymous" alt="สถานการณ์ผู้ป่วย" style="max-width:100%; border-radius:10px; border:1px solid var(--line); margin-top:4px; display:inline-block;">`;
+            const img = document.getElementById("patientImg");
+            img.src = data.url;
+            img.onload = () => document.getElementById("patientSrc").innerHTML = "อัปเดตล่าสุด: " + data.update;
+        } else {
+            document.getElementById("patientImgWrap").innerHTML = "ไม่พบข้อมูลรูปภาพผู้ป่วยในระบบ";
+        }
+    } catch (err) {
+        console.error("Patient Image Error:", err);
+    }
+}
+
 function showMsg(t){
   let m=document.getElementById("msg");
   if(!m){m=document.createElement("div");m.id="msg";
@@ -387,7 +410,7 @@ document.getElementById("savePng").addEventListener("click", async e=>{
   const btn = e.currentTarget;
   btn.disabled = true; btn.textContent = "กำลังสร้างภาพ...";
   try{
-    if(typeof html2canvas==="undefined") throw new Error("โหลดไลบรารี html2canvas ไม่ได้ (ตรวจอินเทอร์เน็ต)");
+    if(typeof html2canvas==="undefined") throw new Error("โหลดไลบรารี html2canvas ไม่ได้");
     await document.fonts.ready;
     const el = document.querySelector(".wrap");
     const canvas = await html2canvas(el,{
@@ -405,21 +428,16 @@ document.getElementById("savePng").addEventListener("click", async e=>{
   }
 });
 
-/* ===== ระบบล็อกอิน & เริ่มการทำงาน Dashboard ===== */
-let dashboardInterval; // ตัวแปรสำหรับเก็บ Timer ของการรีเฟรชข้อมูล
+let dashboardInterval; 
 
 window.addEventListener("load", () => {
-    // 📌 ดึงเวลาที่ล็อกอินล่าสุดออกมาเช็ก
     const authTime = localStorage.getItem("sat_auth_time");
-    const ONE_HOUR = 60 * 60 * 1000; // 1 ชั่วโมง (มิลลิวินาที)
-
-    // ถ้ามีประวัติล็อกอิน และเวลาผ่านไปไม่ถึง 1 ชั่วโมง
+    const ONE_HOUR = 60 * 60 * 1000; 
     if (authTime && (Date.now() - parseInt(authTime) < ONE_HOUR)) {
         document.getElementById("loginOverlay").style.display = "none";
         document.getElementById("mainDashboard").style.display = "block";
         startDashboard();
     } else {
-        // ถ้าเกิน 1 ชั่วโมง หรือยังไม่เคยล็อกอิน ให้เคลียร์ของเก่าและโชว์หน้าล็อกอิน
         localStorage.removeItem("sat_auth_time");
         document.getElementById("loginOverlay").style.display = "flex";
         document.getElementById("mainDashboard").style.display = "none";
@@ -429,28 +447,22 @@ window.addEventListener("load", () => {
 function startDashboard() {
     drawStations();
     refreshAllData();
-    
-    // ตั้งค่าให้รีเฟรชข้อมูลหน้าจอทุก 10 นาที
     dashboardInterval = setInterval(refreshAllData, 600000); 
 
-    // 📌 ตั้งเวลาเช็กการหมดอายุของ Login ทุกๆ 1 นาที
     setInterval(() => {
         const authTime = localStorage.getItem("sat_auth_time");
         const ONE_HOUR = 60 * 60 * 1000;
-        
-        // ถ้าเวลาล่วงเลยไปเกิน 1 ชั่วโมงระหว่างที่เปิดหน้าจอทิ้งไว้
         if (!authTime || (Date.now() - parseInt(authTime) >= ONE_HOUR)) {
             alert("หมดเวลาการใช้งาน (1 ชั่วโมง) ระบบจะทำการออกจากระบบอัตโนมัติ");
             localStorage.removeItem("sat_auth_time");
-            location.reload(); // รีเฟรชหน้าเพื่อให้เด้งกลับไปหน้าล็อกอิน
+            location.reload(); 
         }
     }, 60000);
 }
 
-// 📌 ฟังก์ชันสำหรับปุ่มออกจากระบบ (ถ้ากดเองก่อน 1 ชั่วโมง)
 document.getElementById("btnLogout").addEventListener("click", () => {
-    localStorage.removeItem("sat_auth_time"); // ลบเวลาออก
-    clearInterval(dashboardInterval); // หยุดการดึงข้อมูล
+    localStorage.removeItem("sat_auth_time"); 
+    clearInterval(dashboardInterval); 
     document.getElementById("mainDashboard").style.display = "none";
     document.getElementById("loginOverlay").style.display = "flex";
     document.getElementById("usr").value = "";
@@ -458,10 +470,8 @@ document.getElementById("btnLogout").addEventListener("click", () => {
     document.getElementById("loginMsg").textContent = "";
 });
 
-// ผูกอีเวนต์กดปุ่มเข้าสู่ระบบ
 document.getElementById("btnLogin").addEventListener("click", performLogin);
 
-// ผูกอีเวนต์กดปุ่ม Enter ให้ล็อกอินได้เลย
 document.getElementById("pwd").addEventListener("keypress", function(event) {
   if (event.key === "Enter") {
     event.preventDefault();
@@ -474,22 +484,12 @@ async function performLogin() {
     const p = document.getElementById("pwd").value;
     const msg = document.getElementById("loginMsg");
     const btn = document.getElementById("btnLogin");
-    
-    if (!u || !p) { 
-        msg.textContent = "กรุณากรอกข้อมูลให้ครบถ้วน"; 
-        return; 
-    }
-    
-    btn.disabled = true; 
-    btn.textContent = "กำลังตรวจสอบ...";
-    msg.textContent = "";
-    
+    if (!u || !p) { msg.textContent = "กรุณากรอกข้อมูลให้ครบถ้วน"; return; }
+    btn.disabled = true; btn.textContent = "กำลังตรวจสอบ..."; msg.textContent = "";
     try {
         const res = await fetch(PROXY + `?route=login&user=${u}&pass=${p}`);
         const data = await res.json();
-        
         if (data.success) {
-            // 📌 เมื่อรหัสถูกต้อง ให้บันทึก "เวลาปัจจุบัน (Timestamp)" ไว้ในเครื่อง
             localStorage.setItem("sat_auth_time", Date.now().toString());
             document.getElementById("loginOverlay").style.display = "none";
             document.getElementById("mainDashboard").style.display = "block";
@@ -500,9 +500,7 @@ async function performLogin() {
     } catch(e) {
         msg.textContent = "⚠️ เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์";
     }
-    
-    btn.disabled = false; 
-    btn.textContent = "เข้าสู่ระบบ";
+    btn.disabled = false; btn.textContent = "เข้าสู่ระบบ";
 }
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
