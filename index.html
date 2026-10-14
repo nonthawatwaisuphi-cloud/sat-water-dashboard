@@ -14,16 +14,20 @@ html{-webkit-text-size-adjust:100%}
 body{margin:0;overflow-wrap:break-word;background:var(--bg);color:var(--ink);font-family:'Noto Sans Thai',system-ui,sans-serif;line-height:1.5}
 .wrap{width:100%;max-width:1100px;margin:0 auto;padding:16px;display:none;}
 .wrap *{min-width:0}
+header{text-align:center;padding:8px 0 16px}
+h1{margin:0;line-height:1.3;font-size:clamp(20px,4.2vw,34px);font-weight:800;color:var(--accent)}
+header p{margin:2px 0 0;font-weight:600}
 section{overflow:hidden;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:14px}
 h2{margin:0 0 10px;font-size:18px;font-weight:800;color:var(--water)}
 .days{display:grid;grid-template-columns:repeat(7,1fr);gap:8px}
 @media(max-width:820px){.days{grid-template-columns:repeat(auto-fit,minmax(104px,1fr))}}
 .day{border:1px solid var(--line);border-radius:8px;padding:8px 4px;text-align:center;font-size:13px;line-height:1.35}
-.day b{display:block}.hi{color:var(--bad);font-weight:600}.lo{color:var(--water);font-weight:600}
+.day b{display:block}.day .ic{font-size:26px}.hi{color:var(--bad);font-weight:600}.lo{color:var(--water);font-weight:600}
 .src{font-size:12px;color:var(--mute);margin-top:8px}
 .stations{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:12px}
 .st{overflow:hidden;border:1px solid var(--line);border-radius:8px;padding:12px}
 .st h3{margin:0 0 6px;font-size:15px;line-height:1.35}
+.tag{display:inline-block;color:#fff;border-radius:4px;padding:1px 10px;font-size:13px;font-weight:600}
 .big{font-size:30px;font-weight:800;line-height:1.1;margin:6px 0}
 table{width:100%;table-layout:fixed;border-collapse:collapse;font-size:14px}
 td:first-child{width:46%}
@@ -36,9 +40,8 @@ td{padding:3px 0;border-top:1px solid var(--line)}td:last-child{text-align:right
 .flow-item { width: 100%; font-size: 14px; }
 .flow-label { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 6px; font-weight: 600; }
 .flow-label b { font-size: 20px; color: var(--water); font-weight: 800; line-height: 1; margin-right: 4px; }
-.flow-bar-bg { position:relative; width: 100%; height: 14px; background: var(--line); border-radius: 7px; overflow: hidden; }
+.flow-bar-bg { width: 100%; height: 14px; background: var(--line); border-radius: 7px; overflow: hidden; }
 .flow-bar-fill { height: 100%; background: linear-gradient(90deg, #5db7e8, var(--water)); border-radius: 7px; transition: width 0.5s ease; }
-.flow-scale { display:flex; justify-content:space-between; font-size:11px; color:var(--mute); margin-top:-4px; }
 
 footer{text-align:center;font-size:13px;color:var(--mute);padding:8px}
 a{color:var(--water)}
@@ -64,31 +67,22 @@ a{color:var(--water)}
 .gauge.warn i{background:linear-gradient(90deg,#f3c75a,var(--warn))}
 .gauge.bad i{background:linear-gradient(90deg,#f08a74,var(--bad))}
 .gl{display:flex;justify-content:space-between;font-size:12px;color:var(--mute)}
-
-/* ===== การ์ดพยากรณ์ (เน้นฝน) ===== */
-.day{display:flex;flex-direction:column;align-items:center;gap:2px;padding:10px 4px}
-.day .ic{font-size:34px;line-height:1.2}
-.day .tx{min-height:2.7em;font-weight:600;font-size:12.5px}
-.day .tmp{font-size:12px;color:var(--mute)}
-.day .rain{display:inline-flex;align-items:center;gap:3px;font-size:13px;font-weight:800;border-radius:999px;padding:2px 10px;margin-top:4px;background:rgba(93,113,132,.14);color:var(--mute)}
-.day .rain.some{background:rgba(11,111,164,.16);color:var(--water)}
-.day .rain.heavy{background:var(--bad);color:#fff}
+.day .ic{font-size:34px;line-height:1.2}.day .tx{min-height:2.7em;font-weight:600}.day .rain{color:var(--water);font-size:12px}
 .c-sun{background:rgba(255,196,0,.14)}.c-cloud{background:rgba(120,140,160,.14)}.c-rain{background:rgba(11,111,164,.14)}.c-storm{background:rgba(110,70,170,.16)}.c-cold{background:rgba(80,180,220,.14)}.c-hot{background:rgba(217,56,30,.14)}
 
-/* ===== header (ติดบนตอนเลื่อน) ===== */
-.hd{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;text-align:left;background:linear-gradient(135deg,#0a3a5e,#0b6fa4);color:#fff;border-radius:12px;padding:14px 22px;margin-bottom:14px;box-shadow:0 4px 14px rgba(10,40,70,.18)}
-.hd-id{display:flex;align-items:center;gap:14px;min-width:0}
-.hd-logo{flex:none;width:58px;height:58px;border-radius:50%;background:#fff;border:3px solid rgba(255,255,255,.55);object-fit:contain;padding:3px}
-.hd h1{margin:0;line-height:1.3;font-size:clamp(18px,3.4vw,28px);font-weight:800;color:#fff}
-.hd p{margin:2px 0 0;opacity:.9;font-weight:400;font-size:14px}
-@media(min-width:821px){.hd{position:sticky;top:8px;z-index:30}}
+/* ===== layout polish ===== */
+.wrap{padding:14px}
+.hd{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;text-align:left;background:linear-gradient(135deg,#0a3a5e,#0b6fa4);color:#fff;border-radius:12px;padding:18px 22px;margin-bottom:14px}
+.hd h1{color:#fff;font-size:clamp(20px,3.6vw,30px)}
+.hd p{margin:4px 0 0;opacity:.9;font-weight:400}
 section{box-shadow:0 1px 3px rgba(10,40,70,.08);padding:16px}
 h2{display:flex;align-items:center;gap:8px;font-size:18px;margin-bottom:12px}
 h2::before{content:"";flex:none;width:5px;height:1.1em;border-radius:3px;background:var(--water)}
 .days{gap:10px}
+.day{padding:10px 4px}
 .day .dn{display:block;font-weight:800;font-size:14px}
 .day .dd{display:block;font-size:12px;color:var(--mute)}
-.day.today{border:2px solid var(--water);box-shadow:0 4px 14px rgba(11,111,164,.3);background-image:linear-gradient(rgba(11,111,164,.08),rgba(11,111,164,.08))}
+.day.today{border:2px solid var(--water);box-shadow:0 2px 8px rgba(11,111,164,.25)}
 .day.today .dn{color:var(--water)}
 .stations{gap:14px}
 .st{padding:14px;border-radius:10px}
@@ -98,38 +92,83 @@ footer{margin-top:4px;padding:12px;border-top:1px solid var(--line)}
   .hd-actions { width: 100%; flex-direction: column; }
   #savePng, #btnLogout { width: 100%; }
 }
-@media print{#savePng, #btnLogout{display:none}body{background:#fff}section{box-shadow:none;break-inside:avoid}.hd{position:static}}
-
-/* ===== แถบสรุปสถานการณ์ ===== */
-.alert{display:flex;align-items:center;gap:14px;border-radius:12px;padding:14px 20px;margin-bottom:14px;color:#fff;background:linear-gradient(135deg,#2e9e5b,#1f7a43);box-shadow:0 6px 16px -8px rgba(31,122,67,.7)}
-.alert.warn{background:linear-gradient(135deg,#f0b429,#d98e00);color:#3d2a00;box-shadow:0 6px 16px -8px rgba(217,142,0,.7)}
-.alert.bad{background:linear-gradient(135deg,#e5482b,#b3260f);box-shadow:0 6px 16px -8px rgba(179,38,15,.7)}
-.alert .ai{flex:none;font-size:34px;line-height:1}
-.alert .at{font-size:clamp(20px,3.4vw,28px);font-weight:800;line-height:1.2}
-.alert .as{font-size:14px;font-weight:600;opacity:.92;margin-top:2px}
+@media print{#savePng, #btnLogout{display:none}body{background:#fff}section{box-shadow:none;break-inside:avoid}}
 
 .trend{font-size:13px;font-weight:600;display:flex;align-items:center;gap:6px}
 .trend.up{color:#d9381e}.trend.down{color:#2e9e5b}.trend.flat{color:#5d7184}
 .spark{display:block;width:100%;height:auto;margin-top:2px}
-.lvl{display:inline-block;font-size:13px;font-weight:700;color:#fff;border-radius:999px;padding:1px 12px}
+.lvl{font-size:13px;font-weight:600;color:#fff;border-radius:999px;padding:1px 12px;margin-left:4px}
 .lvl.ok{background:var(--ok)}.lvl.warn{background:#d98e00}.lvl.bad{background:var(--bad)}
 
-/* ===== รายงานสถานการณ์ผู้ป่วย ===== */
+/* ===== รายงานสถานการณ์ผู้ป่วย (ใหม่) ===== */
 .pt-meta{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:14px}
 .chip{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;border-radius:999px;padding:3px 12px;background:rgba(11,111,164,.1);color:var(--water)}
 .chip.test{background:rgba(232,162,0,.16);color:#a06c00}
+.pt-grid{display:grid;grid-template-columns:minmax(180px,1.1fr) repeat(4,minmax(120px,1fr));gap:12px}
+@media(max-width:900px){.pt-grid{grid-template-columns:repeat(2,1fr)}.pt-total{grid-column:1/-1}}
+.pt-card{position:relative;border:1px solid var(--line);border-radius:12px;padding:14px 14px 12px;background:var(--card);overflow:hidden;display:flex;flex-direction:column;gap:2px}
+.pt-card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--c,var(--water))}
+.pt-card .lb{font-size:13px;font-weight:600;color:var(--mute);line-height:1.3;min-height:2.6em}
+.pt-card .nm{font-size:38px;font-weight:800;line-height:1.1;color:var(--c,var(--water))}
+.pt-card .nm small{font-size:13px;font-weight:600;color:var(--mute);margin-left:4px}
+.pt-card .pc{font-size:12px;color:var(--mute);font-weight:600}
+.pt-card .mini{height:6px;border-radius:3px;background:var(--line);overflow:hidden;margin-top:6px}
+.pt-card .mini i{display:block;height:100%;background:var(--c,var(--water));border-radius:3px}
+.pt-total{background:linear-gradient(135deg,#0a3a5e,#0b6fa4);color:#fff;border:0}
+.pt-total::before{display:none}
+.pt-total .lb{color:rgba(255,255,255,.85)}
+.pt-total .nm{color:#fff;font-size:48px}
+.pt-total .nm small{color:rgba(255,255,255,.85)}
+.pt-total .pc{color:rgba(255,255,255,.8)}
+.stack{display:flex;height:16px;border-radius:8px;overflow:hidden;margin:16px 0 6px;background:var(--line)}
+.stack i{display:block;height:100%}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:12px;color:var(--mute);margin-bottom:16px}
+.legend span::before{content:"";display:inline-block;width:10px;height:10px;border-radius:3px;background:var(--c);margin-right:6px;vertical-align:-1px}
+.pt-two{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:14px}
 .pt-panel{border:1px solid var(--line);border-radius:12px;padding:14px}
 .pt-panel h3{margin:0 0 12px;font-size:15px;font-weight:800;color:var(--ink)}
+.res{display:flex;flex-direction:column;gap:11px}
+.res-row .top{display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-size:14px;font-weight:600;margin-bottom:4px}
+.res-row .top b{font-size:17px;font-weight:800;color:var(--water)}
+.res-row .bar{height:10px;border-radius:5px;background:var(--line);overflow:hidden}
+.res-row .bar i{display:block;height:100%;border-radius:5px;background:linear-gradient(90deg,#5db7e8,var(--water))}
+.res-row.pall .top b{color:var(--mute)}
+.res-row.pall .bar i{background:linear-gradient(90deg,#b8c4d0,#8496a8)}
+.rank{display:flex;flex-direction:column;gap:8px}
+.rank-row{display:flex;align-items:center;gap:12px;border:1px solid var(--line);border-radius:10px;padding:8px 12px}
+.rank-no{flex:none;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;color:#fff;background:#8496a8}
+.rank-row:nth-child(1) .rank-no{background:#c8102e}
+.rank-row:nth-child(2) .rank-no{background:#e8553d}
+.rank-row:nth-child(3) .rank-no{background:#e8a200}
+.rank-nm{flex:1;font-weight:600;font-size:14px}
+.rank-ct{font-weight:800;color:var(--water);font-size:16px}
+.rank-ct small{font-size:11px;font-weight:600;color:var(--mute);margin-left:3px}
 .empty{color:var(--mute);font-size:14px;text-align:center;padding:22px 8px;border:1px dashed var(--line);border-radius:10px}
 
+
+/* ===== 3 ช่อง (พอดีหน้าจอตอนนำเสนอ) ===== */
 .pt-three{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;align-items:stretch}
 @media(max-width:900px){.pt-three{grid-template-columns:1fr}}
 .pt-three .pt-panel{display:flex;flex-direction:column;padding:14px 16px}
 .pt-three h3{display:flex;align-items:center;gap:8px;line-height:1.3}
 .pt-three h3 .n{flex:none;width:24px;height:24px;border-radius:50%;background:var(--water);color:#fff;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center}
+.pt-sum{display:flex;align-items:baseline;justify-content:space-between;gap:8px;background:linear-gradient(135deg,#0a3a5e,#0b6fa4);color:#fff;border-radius:10px;padding:10px 14px;margin-bottom:12px}
+.pt-sum span{font-size:13px;font-weight:600;opacity:.9}
+.pt-sum b{font-size:36px;font-weight:800;line-height:1}
+.pt-sum small{font-size:13px;font-weight:600;margin-left:4px;opacity:.9}
+.cat-list{display:flex;flex-direction:column;gap:12px}
+.cat-row .top{display:flex;align-items:baseline;gap:8px;font-size:14px;font-weight:600;margin-bottom:4px}
+.cat-row .dot{flex:none;width:11px;height:11px;border-radius:3px;background:var(--c);align-self:center}
+.cat-row .cl{flex:1}
+.cat-row b{font-size:22px;font-weight:800;color:var(--c);line-height:1}
+.cat-row .pc{font-size:12px;color:var(--mute);font-weight:600;min-width:42px;text-align:right}
+.cat-row .bar{height:8px;border-radius:4px;background:var(--line);overflow:hidden}
+.cat-row .bar i{display:block;height:100%;background:var(--c);border-radius:4px}
 .pt-three .empty{margin-top:4px}
 #patientImgWrap>.empty{min-height:120px;display:flex;align-items:center;justify-content:center}
 
+
+/* ===== รายงานผู้ป่วย: แถบ KPI 5 สี + 3 ตาราง (เลย์เอาต์ตามชีต) ===== */
 .kpi-strip{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin-bottom:16px}
 @media(max-width:900px){.kpi-strip{grid-template-columns:repeat(2,minmax(0,1fr))}.kpi.total{grid-column:1/-1}}
 .kpi{position:relative;overflow:hidden;border-radius:14px;padding:16px 10px 14px;text-align:center;color:#fff;background:linear-gradient(160deg,var(--c1),var(--c2));box-shadow:0 8px 18px -8px var(--c2)}
@@ -162,12 +201,14 @@ footer{margin-top:4px;padding:12px;border-top:1px solid var(--line)}
 .pt-tbl .mute{color:var(--mute);font-weight:400}
 .pt-tbl.rank-t td{padding:12px}
 
+
 .pt-loading{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;min-height:180px;color:var(--mute);font-size:15px;font-weight:600;text-align:center}
 .pt-loading .spin{width:34px;height:34px;border-radius:50%;border:4px solid var(--line);border-top-color:var(--water);animation:ptspin .9s linear infinite}
 @keyframes ptspin{to{transform:rotate(360deg)}}
 #ridImgWrap .pt-loading{min-height:240px}
 #ridImgWrap>.empty{min-height:120px;display:flex;align-items:center;justify-content:center}
 @media(prefers-reduced-motion:reduce){.pt-loading .spin{animation-duration:2.5s}}
+
 
 /* ===== แจ้งล็อกอินสำเร็จ ===== */
 .login-success{display:none;flex-direction:column;align-items:center;gap:6px;padding:4px 0 6px}
@@ -187,12 +228,15 @@ footer{margin-top:4px;padding:12px;border-top:1px solid var(--line)}
 @keyframes lsBar{to{width:100%}}
 @keyframes lsDots{0%{content:""}25%{content:"."}50%{content:".."}75%{content:"..."}}
 
-/* ===== แจ้งเตือนล็อกอินไม่สำเร็จ ===== */
+
+/* ===== แจ้งเตือนล็อกอินไม่สำเร็จ (แสดงแล้วหายเอง) ===== */
 #loginMsg{transition:opacity .4s ease,transform .4s ease}
 #loginMsg.show{background:rgba(217,56,30,.1);border:1px solid rgba(217,56,30,.35);border-radius:10px;padding:9px 12px}
 .login-box.shake{animation:lsShake .45s ease}
 @keyframes lsShake{10%,90%{transform:translateX(-2px)}20%,80%{transform:translateX(4px)}30%,50%,70%{transform:translateX(-7px)}40%,60%{transform:translateX(7px)}}
 
+
+/* ===== แจ้งล็อกอินไม่สำเร็จ (เต็มกล่อง แล้วกลับไปฟอร์มเอง) ===== */
 .login-box.fail h2,.login-box.fail>p,.login-box.fail .login-input,.login-box.fail .login-btn,.login-box.fail #loginMsg{display:none}
 .login-box.fail .login-fail{display:flex}
 .login-box.fail .login-logo{margin-bottom:20px}
@@ -204,12 +248,12 @@ footer{margin-top:4px;padding:12px;border-top:1px solid var(--line)}
 .login-fail .ls-bar i{width:100%;background:linear-gradient(90deg,#f08a74,var(--bad));animation:lsDrain 2.6s linear forwards}
 @keyframes lsDrain{to{width:0}}
 
-/* ===== ระบบล็อกอิน ===== */
+/* ===== ระบบล็อกอิน (Login UI) ===== */
 .login-wrap { position:fixed; inset:0; background: linear-gradient(135deg, rgba(11,111,164,0.15), rgba(11,111,164,0.05)), var(--bg); z-index:9999; display:flex; align-items:center; justify-content:center; padding:20px; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
 .login-box { background: var(--card); padding: 40px 30px; border-radius: 20px; box-shadow: 0 10px 40px rgba(10,40,70,0.12); width: 100%; max-width: 360px; text-align: center; border: 1px solid var(--line); }
 .login-logo { width: 104px; height: 104px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; background: #fff; box-shadow: 0 4px 12px rgba(11,111,164,0.15); overflow: hidden; border: 3px solid #eef3f7; }
 .login-box h2 { color: var(--water); margin: 0 0 6px; font-size: 24px; font-weight: 800; justify-content:center;}
-.login-box h2::before { display: none; }
+.login-box h2::before { display: none; } 
 .login-box p { font-size: 14px; color: var(--mute); margin: 0 0 28px; font-weight: 600; line-height: 1.4; }
 .login-input { width: 100%; padding: 14px 16px; margin-bottom: 14px; border: 2px solid var(--line); border-radius: 12px; font-size: 15px; font-family: inherit; background: var(--bg); color: var(--ink); outline: none; transition: all 0.3s ease; }
 .login-input:focus { border-color: var(--water); background: var(--card); box-shadow: 0 0 0 4px rgba(11,111,164,0.1); }
@@ -226,7 +270,7 @@ footer{margin-top:4px;padding:12px;border-top:1px solid var(--line)}
 <div id="loginOverlay" class="login-wrap">
   <div class="login-box">
     <div class="login-logo">
-      <img id="loginLogo" src="data:image/jpeg;base64,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" alt="โลโก้โรงพยาบาลพระนครศรีอยุธยา" style="width:100%;height:100%;object-fit:contain;padding:4px;">
+      <img src="data:image/jpeg;base64,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" alt="โลโก้โรงพยาบาลพระนครศรีอยุธยา" style="width:100%;height:100%;object-fit:contain;padding:4px;">
     </div>
     <h2>เข้าสู่ระบบ</h2>
     <p>ระบบติดตามสถานการณ์น้ำ<br>ศูนย์ปฏิบัติการฉุกเฉิน (SAT)</p>
@@ -251,24 +295,15 @@ footer{margin-top:4px;padding:12px;border-top:1px solid var(--line)}
 
 <div class="wrap" id="mainDashboard">
 <header class="hd">
-  <div class="hd-id">
-    <img id="hdLogo" class="hd-logo" alt="โลโก้โรงพยาบาลพระนครศรีอยุธยา">
-    <div>
-      <h1>สถานการณ์น้ำทีม SAT รพ.พระนครศรีอยุธยา</h1>
-      <p id="today">วันที่ ...</p>
-    </div>
+  <div>
+    <h1>สถานการณ์น้ำทีม SAT รพ.พระนครศรีอยุธยา</h1>
+    <p id="today">วันที่ ...</p>
   </div>
   <div class="hd-actions">
     <button id="savePng" data-html2canvas-ignore="true">💾 บันทึกเป็นภาพ PNG</button>
     <button id="btnLogout" data-html2canvas-ignore="true">🚪 ออกจากระบบ</button>
   </div>
 </header>
-
-<!-- แถบสรุปสถานการณ์ภาพรวม -->
-<div class="alert" id="alertBar" role="status">
-  <div class="ai">⏳</div>
-  <div><div class="at">กำลังประเมินสถานการณ์...</div><div class="as">รอข้อมูลระดับน้ำ</div></div>
-</div>
 
 <!-- 1) พยากรณ์อากาศ -->
 <section>
@@ -290,9 +325,9 @@ footer{margin-top:4px;padding:12px;border-top:1px solid var(--line)}
   <section>
     <h2>แม่น้ำเจ้าพระยา (กรมชลประทาน)</h2>
     <div class="flow" id="flow"></div>
-    <div class="src" id="flowSrc">ข้อมูลจากรายงานสถานการณ์น้ำ กรมชลประทาน</div>
+    <div class="src">ข้อมูลจากรายงานสถานการณ์น้ำ กรมชลประทาน</div>
   </section>
-
+  
   <section id="ridImageContainer">
     <h2>แผนภาพสถานการณ์น้ำ</h2>
     <div id="ridImgWrap"><div class="pt-loading"><span class="spin"></span><span>กำลังโหลดภาพ...</span></div></div>
@@ -318,23 +353,20 @@ const PROVINCE = "พระนครศรีอยุธยา";
 // ระยะเวลาล็อกอิน (ชั่วโมง) — เปลี่ยนตัวเลขนี้ที่เดียว
 const SESSION_HOURS = 8;
 const SESSION_MS = SESSION_HOURS * 60 * 60 * 1000;
-// สเกลตายตัวของกราฟปริมาณน้ำ (ลบ.ม./วินาที) — ขยายเองอัตโนมัติถ้าค่าจริงเกิน
-const FLOW_SCALE = 3000;
-// ฝนตั้งแต่ค่านี้ (มม./วัน) ขึ้นไปถือว่าฝนหนัก ใช้ไฮไลต์สีแดงในการ์ดพยากรณ์
-const HEAVY_RAIN_MM = 35;
+// ⚠️ ห้ามลืม! แทนที่ URL นี้ด้วย URL Web App ของคุณ
 const PROXY = "https://script.google.com/macros/s/AKfycbxCnnxP5Zkv0S_V_Zc8KyerXAR31dwOI0tg4vvt_Czt-Nq4FgkqqdO_mVUHzXwNH5j4Ow/exec";
-
-// ใช้รูปโลโก้เดียวกับหน้า login ไม่ต้องฝังซ้ำ
-document.getElementById("hdLogo").src = document.getElementById("loginLogo").src;
 
 /* ===== ข้อมูล Dummy ระหว่างรอ API ===== */
 const DATA = {
   updated: "กำลังโหลด...",
-  stations: [],
+  stations: [
+    {name:"สะพานปรีดี-ธำรง",code:"S.5",status:"รอข้อมูล",color:"#5d7184",diff:"0",level:"0",bank:"4.7",bed:"-8.59",time:"-",history:null},
+    {name:"ค่ายจิรประวัติ (C2)",code:"C.2",status:"รอข้อมูล",color:"#5d7184",diff:"0",level:"0",bank:"25.7",bed:"13.32",time:"-",history:null},
+    {name:"ท้ายเขื่อนเจ้าพระยา (C13)",code:"C.13",status:"รอข้อมูล",color:"#5d7184",diff:"0",level:"0",bank:"16.34",bed:"2.08",time:"-",history:null}
+  ],
   histStep: 6,
   flow: []
 };
-let WX_MAXRAIN = null; // ฝนสูงสุดในช่วงพยากรณ์ ใช้ประกอบแถบสรุป
 
 function updateTodayDate() {
   const th = new Date().toLocaleDateString("th-TH",{day:"numeric",month:"long",year:"numeric"});
@@ -372,41 +404,26 @@ const grade = d => d<0?["bad","ล้นตลิ่ง"]:d<0.5?["bad","ใก�
 const num = x => Number(String(x).replace(/,/g,""));
 const esc = s => String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 
-/* ===== แถบสรุปสถานการณ์ภาพรวม ===== */
-function drawAlert(){
-  const bar = document.getElementById("alertBar");
-  if(!DATA.stations.length) return;
-  const worst = DATA.stations.reduce((a,b)=>num(b.diff)<num(a.diff)?b:a);
-  const d = num(worst.diff), [cls,txt] = grade(d);
-  const ic = {ok:"✅",warn:"⚠️",bad:"🚨"}[cls];
-  const title = {ok:"สถานการณ์ปกติ",warn:"เฝ้าระวัง",bad:"แจ้งเตือน: น้ำใกล้/ล้นตลิ่ง"}[cls];
-  let sub = `${worst.name} ${d<0?"สูงกว่าตลิ่ง":"ต่ำกว่าตลิ่ง"} ${Math.abs(d).toFixed(2)} ม. (${txt})`;
-  if(WX_MAXRAIN && WX_MAXRAIN.v >= 0.1) sub += ` · ฝนสูงสุดในช่วงพยากรณ์ ${WX_MAXRAIN.v.toFixed(1)} มม. (${WX_MAXRAIN.label})`;
-  bar.className = "alert " + (cls==="ok"?"":cls);
-  bar.innerHTML = `<div class="ai">${ic}</div><div><div class="at">${title}</div><div class="as">${esc(sub)}</div></div>`;
-}
-
 function drawStations(){
   if(DATA.stations.length === 0) return;
   document.getElementById("stations").innerHTML = DATA.stations.map(s=>{
     const d = num(s.diff), [cls,txt] = grade(d);
     const pct = Math.max(0,Math.min(100,(num(s.level)-num(s.bed))/(num(s.bank)-num(s.bed))*100));
     return `<div class="st">
-     <div class="sth"><h3>${esc(s.name)}</h3>${s.code?`<span class="code">${esc(s.code)}</span>`:""}</div>
-     <div><span class="lvl ${cls}">${txt}</span></div>
-     <div class="hero ${cls}"><b>${Math.abs(d).toFixed(2)}</b><span>ม.</span><small>${d<0?"สูงกว่าตลิ่ง":"ต่ำกว่าตลิ่ง"}</small></div>
+     <div class="sth"><h3>${s.name}</h3>${s.code?`<span class="code">${s.code}</span>`:""}</div>
+     <div><span class="tag" style="background:${s.color}">${s.status}</span></div>
+     <div class="hero ${cls}"><b>${Math.abs(d).toFixed(2)}</b><span>ม.</span><small>${d<0?"สูงกว่าตลิ่ง":"ต่ำกว่าตลิ่ง"} · ${txt}</small></div>
      <div class="gauge ${cls}" role="img" aria-label="น้ำอยู่ที่ ${pct.toFixed(0)}% ของความลึกถึงตลิ่ง"><i style="width:${pct}%"></i></div>
-     <div class="gl"><span>ท้องน้ำ ${esc(s.bed)}</span><span>น้ำสูง ${pct.toFixed(0)}% ของตลิ่ง</span><span>ตลิ่ง ${esc(s.bank)}</span></div>
+     <div class="gl"><span>ท้องน้ำ ${s.bed}</span><span>น้ำสูง ${pct.toFixed(0)}% ของตลิ่ง</span><span>ตลิ่ง ${s.bank}</span></div>
      ${(()=>{const t=s.history&&s.history.length>1?trendOf(s.history):null;return t?`<div class="trend ${t[0]}">${t[1]}</div>`:""})()}
      ${spark(s,cls)}
      <table>
-      <tr><td>ระดับน้ำปัจจุบัน</td><td>${esc(s.level)} ม.รทก.</td></tr>
-      <tr><td>เวลาข้อมูล</td><td>${esc(s.time)} น.</td></tr>
+      <tr><td>ระดับน้ำปัจจุบัน</td><td>${s.level} ม.รทก.</td></tr>
+      <tr><td>เวลาข้อมูล</td><td>${s.time} น.</td></tr>
      </table></div>`;}).join("");
   const near = DATA.stations.reduce((a,b)=>num(b.diff)<num(a.diff)?b:a);
-  document.getElementById("sum").innerHTML = `จุดที่น้ำใกล้ตลิ่งที่สุด: <b>${esc(near.name)}</b> ${num(near.diff)<0?"สูงกว่าตลิ่ง":"ต่ำกว่าตลิ่ง"} ${Math.abs(num(near.diff)).toFixed(2)} ม. · ทั้งหมด ${DATA.stations.length} สถานี`;
+  document.getElementById("sum").innerHTML = `จุดที่น้ำใกล้ตลิ่งที่สุด: <b>${near.name}</b> ${num(near.diff)<0?"สูงกว่าตลิ่ง":"ต่ำกว่าตลิ่ง"} ${Math.abs(num(near.diff)).toFixed(2)} ม. · ทั้งหมด ${DATA.stations.length} สถานี`;
   document.getElementById("stsrc").textContent = `ข้อมูลล่าสุด ${DATA.updated} · ศูนย์ข้อมูลน้ำระดับจังหวัด / กรมชลประทาน`;
-  drawAlert();
 }
 
 const COND = {1:["☀️","ฟ้าโปร่ง","c-sun"],2:["🌤️","มีเมฆบางส่วน","c-sun"],3:["⛅","เมฆเป็นส่วนมาก","c-cloud"],4:["☁️","เมฆมาก","c-cloud"],5:["🌦️","ฝนตกเล็กน้อย","c-rain"],6:["🌧️","ฝนปานกลาง","c-rain"],7:["⛈️","ฝนหนัก","c-storm"],8:["🌩️","ฝนฟ้าคะนอง","c-storm"],9:["🥶","หนาวจัด","c-cold"],10:["🧥","หนาว","c-cold"],11:["🍃","เย็น","c-cold"],12:["🔥","ร้อนจัด","c-hot"]};
@@ -414,106 +431,76 @@ const COND = {1:["☀️","ฟ้าโปร่ง","c-sun"],2:["🌤️","ม�
 function renderWeather(days, note){
   document.getElementById("days").innerHTML = days.map((d,i)=>{
     const [ic,tx,cl] = COND[d.cond] || ["❔","-",""];
-    const rv = d.rainMm;
-    const rcls = rv==null ? "" : rv>=HEAVY_RAIN_MM ? " heavy" : rv>=0.1 ? " some" : "";
-    const dn = i==0?"วันนี้":i==1?"พรุ่งนี้":new Date(d.date).toLocaleDateString("th-TH",{weekday:"short"});
-    return `<div class="day ${cl}${i==0?" today":""}"><span class="dn">${dn}</span><span class="dd">${new Date(d.date).toLocaleDateString("th-TH",{day:"numeric",month:"short"})}</span><div class="ic">${ic}</div>
-      <div class="tx">${tx}</div>
-      <div class="rain${rcls}">💧 ${d.rainTxt}</div>
-      <div class="tmp"><span class="hi">${Math.round(d.max)}°</span> / <span class="lo">${Math.round(d.min)}°</span></div></div>`;}).join("");
+    return `<div class="day ${cl}${i==0?" today":""}"><span class="dn">${i==0?"วันนี้":i==1?"พรุ่งนี้":new Date(d.date).toLocaleDateString("th-TH",{weekday:"short"})}</span><span class="dd">${new Date(d.date).toLocaleDateString("th-TH",{day:"numeric",month:"short"})}</span><div class="ic">${ic}</div>
+      <div><span class="hi">${Math.round(d.max)}°</span> / <span class="lo">${Math.round(d.min)}°</span></div>
+      <div class="tx">${tx}</div><div class="rain">💧 ${d.rainTxt ?? Math.round(d.rh)+"%"}</div></div>`;}).join("");
   document.getElementById("wxsrc").textContent = note;
 }
 
-async function refreshAllData(retry) {
-    retry = typeof retry === "number" ? retry : 0;
+async function refreshAllData() {
     updateTodayDate();
     try {
         const res = await fetch(PROXY + "?route=dashboard");
         if (!res.ok) throw new Error("HTTP " + res.status);
         const data = await res.json();
-
+        
         updateWeather(data.weather);
         updateWater(data.water);
         updateFlow(data.flow);
-        updateImage(data.image);
+        updateImage(data.image); 
 
     } catch (err) {
         console.error("Dashboard Error:", err);
         showMsg("ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้ กำลังลองใหม่...");
-        waterFailed = true;
     }
-
-    if (retry === 0) fetchPatientTable();
-    // ข้อมูลน้ำล้มเหลว → ลองใหม่ใน 20 วินาที (สูงสุด 3 ครั้ง) แทนที่จะรอรอบ 10 นาที
-    if (waterFailed && retry < 3) setTimeout(() => refreshAllData(retry + 1), 20000);
+    
+    // 📌 ดึงรายงานผู้ป่วยแยกต่างหาก
+    fetchPatientTable();
 }
 
 function updateWeather(weather){
     if(!weather || !weather.WeatherForecasts) return;
     const days = weather.WeatherForecasts[0].forecasts;
-    const mapped = days.map(x=>{
-        const r = x.data.rain;
-        return {
-            date:new Date(x.time),
-            max:x.data.tc_max,
-            min:x.data.tc_min,
-            rh:x.data.rh,
-            cond:x.data.cond,
-            rainMm: r != null ? Number(r) : null,
-            rainTxt: r != null ? (r < 0.1 ? "ไม่มีฝน" : Number(r).toFixed(1) + " มม.") : "ชื้น " + Math.round(x.data.rh) + "%"
-        };
-    });
-    // ฝนสูงสุดในช่วงพยากรณ์ → แถบสรุปด้านบน
-    let best = null;
-    mapped.forEach((m,i)=>{ if(m.rainMm!=null && (!best || m.rainMm>best.v)) best = {v:m.rainMm, label: i==0?"วันนี้":i==1?"พรุ่งนี้":m.date.toLocaleDateString("th-TH",{weekday:"short",day:"numeric",month:"short"})}; });
-    WX_MAXRAIN = best;
-    renderWeather(mapped,"อ้างอิงข้อมูล: กรมอุตุนิยมวิทยา");
-    drawAlert();
+    renderWeather(days.map(x=>({
+        date:new Date(x.time),
+        max:x.data.tc_max,
+        min:x.data.tc_min,
+        rh:x.data.rh,
+        cond:x.data.cond,
+        rainTxt: x.data.rain != null ? (x.data.rain < 0.1 ? "ไม่มีฝน" : "ฝน " + Number(x.data.rain).toFixed(1) + " มม.") : "ชื้น " + Math.round(x.data.rh) + "%"
+    })),"อ้างอิงข้อมูล: กรมอุตุนิยมวิทยา");
 }
 
-let waterFailed = false;
 function updateWater(w){
     if(!w || w.error || !w.stations || w.stations.length === 0) {
-        waterFailed = true;
-        console.warn("Water data unavailable:", w && w.error ? w.error : w);
-        // มีข้อมูลรอบก่อนอยู่แล้ว → คงไว้ ไม่ล้างหน้าจอ
-        if(DATA.stations.length){
-            document.getElementById("stsrc").textContent = `⚠️ รอบล่าสุดดึงข้อมูลไม่สำเร็จ กำลังแสดงข้อมูลเดิมของ ${DATA.updated}`;
-            return;
-        }
-        document.getElementById("sum").innerHTML = `<span style="color:var(--bad)">⚠️ ไม่สามารถดึงข้อมูลระดับน้ำได้ในขณะนี้ กำลังลองใหม่...</span>`;
-        const bar = document.getElementById("alertBar");
-        bar.className = "alert warn";
-        bar.innerHTML = `<div class="ai">❓</div><div><div class="at">ไม่ทราบสถานการณ์</div><div class="as">ไม่สามารถดึงข้อมูลระดับน้ำได้ในขณะนี้</div></div>`;
+        document.getElementById("sum").innerHTML = `<span style="color:var(--bad)">⚠️ ไม่สามารถดึงข้อมูลระดับน้ำได้ในขณะนี้</span>`;
         return;
     }
-    waterFailed = false;
     DATA.updated = w.update;
     DATA.stations = w.stations.map(s=>({
         name:s.name, code:s.code, level:parseFloat(s.level).toFixed(2), bank:s.bank, bed:s.ground, diff:parseFloat(s.diff).toFixed(2),
-        time:s.time, history:null
+        time:s.time, history:null, color:"#1f5fd1", status:"ข้อมูลล่าสุด"
     }));
     drawStations();
 }
 
 function updateFlow(flow){
     if(!flow || !flow.data) return;
-    const vals = flow.data.map(f => Number(f.flow.toString().replace(/,/g, "")));
-    const scale = Math.max(FLOW_SCALE, ...vals);
-    document.getElementById("flow").innerHTML = flow.data.map((f,i) => {
-        const val = vals[i];
-        const pct = Math.min(100, val / scale * 100);
+    const maxFlow = Math.max(...flow.data.map(f => Number(f.flow.toString().replace(/,/g, ""))));
+    document.getElementById("flow").innerHTML = flow.data.map(f => {
+        const val = Number(f.flow.toString().replace(/,/g, ""));
+        const pct = maxFlow > 0 ? (val / maxFlow) * 100 : 0;
         return `
         <div class="flow-item">
             <div class="flow-label">
-                <span>${esc(f.name)}</span>
+                <span>${f.name}</span>
                 <span><b>${val.toLocaleString()}</b><small style="font-size:12px; color:var(--mute); font-weight:400;">ลบ.ม./วินาที</small></span>
             </div>
-            <div class="flow-bar-bg" role="img" aria-label="ปริมาณน้ำ ${val} จากสเกล ${scale}">
+            <div class="flow-bar-bg" role="img" aria-label="ปริมาณน้ำ ${val}">
                 <div class="flow-bar-fill" style="width: ${pct}%"></div>
             </div>
         </div>`;
-    }).join("") + `<div class="flow-scale"><span>0</span><span>สเกลเต็ม ${scale.toLocaleString()} ลบ.ม./วินาที</span></div>`;
+    }).join("");
 }
 
 function updateImage(img){
@@ -535,7 +522,7 @@ function updateImage(img){
     }
     image.onload = () => {
         showImg();
-        document.getElementById("ridSrc").innerHTML = "อัปเดตล่าสุด: " + esc(img.update) + (triedFallback ? " (เซฟภาพ PNG อาจไม่ติดรูป)" : "") + " · กรมชลประทาน";
+        document.getElementById("ridSrc").innerHTML = "อัปเดตล่าสุด: " + img.update + (triedFallback ? " (เซฟภาพ PNG อาจไม่ติดรูป)" : "") + " · กรมชลประทาน";
     };
     image.onerror = () => {
         if (!triedFallback) {
@@ -550,14 +537,17 @@ function updateImage(img){
 
 /* ===== รายงานสถานการณ์ผู้ป่วย: แปลงตารางดิบ → การ์ด/กราฟ ===== */
 function renderPatient(tableData){
+  // ตัดแถวว่างทิ้ง แล้วหาข้อมูลจาก "ข้อความในแถว" (ไม่พึ่งเลขแถวตายตัว)
   const rows = tableData.map(r => r.map(c => String(c==null?"":c).trim())).filter(r => r.some(c => c !== ""));
   const toN = v => { const n = Number(String(v).replace(/,/g,"")); return isNaN(n) ? 0 : n; };
   const findRow = (kw, from=0) => { for(let i=from;i<rows.length;i++) if(rows[i].some(c=>c.includes(kw))) return i; return -1; };
 
+  // หัวเรื่อง/วันที่
   const testNote = rows[0] && rows[0][0].includes("ทดสอบ") ? rows[0][0].replace(/\*+/g,"").replace(/\s+/g," ").trim() : "";
   const dI = findRow("ข้อมูลวันที่");
   const dateTxt = dI >= 0 ? (rows[dI].slice(1).find(c=>c!=="") || "") : "";
 
+  // 1) ผู้ป่วยคงเหลือ + 4 ประเภท
   const lI = findRow("ผู้ป่วยคงเหลือ");
   let total = 0, cats = [];
   if(lI >= 0 && rows[lI+1]){
@@ -572,6 +562,7 @@ function renderPatient(tableData){
     if(!total) total = cats.reduce((a,b)=>a+b.n,0);
   }
 
+  // 2) ทรัพยากร + 3) อันดับหน่วยงาน (อ่านจากแถวหัวตาราง)
   const hI = findRow("ประเภทผู้ป่วย");
   let res = [], rank = [];
   if(hI >= 0){
@@ -599,6 +590,7 @@ function renderPatient(tableData){
     ${testNote?`<span class="chip test">⚠️ ${esc(testNote)}</span>`:""}
   </div>`;
 
+  // แถบ KPI 5 สี (เหมือนหัวชีต)
   const tp = ["#3a63a8","#284a86"];
   h += `<div class="kpi-strip">
     <div class="kpi total" style="--c1:${tp[0]};--c2:${tp[1]}"><div class="kl">ผู้ป่วยคงเหลือ</div><div class="kn">${total.toLocaleString()}</div><span class="kp">รวมทุกประเภท</span></div>
@@ -607,17 +599,20 @@ function renderPatient(tableData){
 
   h += `<div class="pt-three">`;
 
+  // 1) ผู้ป่วยแต่ละประเภท
   h += `<div class="pt-panel"><h3><span class="n">1</span>ผู้ป่วยแต่ละประเภท</h3>
     <table class="pt-tbl"><thead><tr><th>ประเภทผู้ป่วย</th><th>จำนวน (ราย)</th></tr></thead><tbody>
     ${cats.map(c=>`<tr><td><span class="dot" style="background:${pal(c.label)[0]}"></span>${esc(c.label)}</td><td class="num" style="color:${pal(c.label)[1]}">${c.n.toLocaleString()}</td></tr>`).join("")}
     </tbody></table></div>`;
 
+  // 2) ทรัพยากรที่ต้องการ
   h += `<div class="pt-panel"><h3><span class="n">2</span>ทรัพยากรที่ต้องการ</h3>`;
   h += res.length ? `<table class="pt-tbl"><thead><tr><th>ทรัพยากร</th><th>จำนวน</th></tr></thead><tbody>
     ${res.map(r=>`<tr class="${/palliative/i.test(r.name)?"pall":""}"><td>${esc(r.name)}<div class="rb"><i style="width:${r.n/maxRes*100}%"></i></div></td><td class="num">${r.n.toLocaleString()}</td></tr>`).join("")}
     </tbody></table>` : `<div class="empty">ไม่มีข้อมูลทรัพยากร</div>`;
   h += `</div>`;
 
+  // 3) 5 อันดับหน่วยงาน (แสดงครบ 5 แถวเสมอ ถึงยังไม่มีข้อมูล)
   const rk5 = [0,1,2,3,4].map(i => rank[i] || null);
   h += `<div class="pt-panel"><h3><span class="n">3</span>5 อันดับหน่วยงานที่มีผู้ป่วยแดง (5,4) On ET Tube</h3>
     <table class="pt-tbl rank-t"><thead><tr><th class="rk-h">อันดับ</th><th>หน่วยงาน</th><th>จำนวน (ราย)</th></tr></thead><tbody>
@@ -667,12 +662,10 @@ function showPreview(url,name){
 document.getElementById("savePng").addEventListener("click", async e=>{
   const btn = e.currentTarget;
   btn.disabled = true; btn.textContent = "กำลังสร้างภาพ...";
-  const hd = document.querySelector(".hd");
   try{
     if(typeof html2canvas==="undefined") throw new Error("โหลดไลบรารี html2canvas ไม่ได้");
     await document.fonts.ready;
     const el = document.querySelector(".wrap");
-    hd.style.position = "static"; // กัน header ติดบนทำให้ภาพเพี้ยน
     const canvas = await html2canvas(el,{
       scale:2, useCORS:true, windowWidth:1100,
       backgroundColor:getComputedStyle(document.body).backgroundColor
@@ -684,12 +677,11 @@ document.getElementById("savePng").addEventListener("click", async e=>{
   }catch(err){
     showMsg("บันทึกภาพไม่สำเร็จ: "+err.message);
   }finally{
-    hd.style.position = "";
     btn.disabled = false; btn.textContent = "💾 บันทึกเป็นภาพ PNG";
   }
 });
 
-let dashboardInterval;
+let dashboardInterval; 
 
 window.addEventListener("load", () => {
     const authTime = localStorage.getItem("sat_auth_time");
@@ -707,21 +699,21 @@ window.addEventListener("load", () => {
 function startDashboard() {
     drawStations();
     refreshAllData();
-    dashboardInterval = setInterval(refreshAllData, 600000);
+    dashboardInterval = setInterval(refreshAllData, 600000); 
 
     setInterval(() => {
         const authTime = localStorage.getItem("sat_auth_time");
         if (!authTime || (Date.now() - parseInt(authTime) >= SESSION_MS)) {
             alert("หมดเวลาการใช้งาน (" + SESSION_HOURS + " ชั่วโมง) ระบบจะทำการออกจากระบบอัตโนมัติ");
             localStorage.removeItem("sat_auth_time");
-            location.reload();
+            location.reload(); 
         }
     }, 60000);
 }
 
 document.getElementById("btnLogout").addEventListener("click", () => {
-    localStorage.removeItem("sat_auth_time");
-    clearInterval(dashboardInterval);
+    localStorage.removeItem("sat_auth_time"); 
+    clearInterval(dashboardInterval); 
     document.getElementById("mainDashboard").style.display = "none";
     document.getElementById("loginOverlay").style.display = "flex";
     document.getElementById("usr").value = "";
@@ -742,6 +734,7 @@ document.getElementById("pwd").addEventListener("keypress", function(event) {
   }
 });
 
+
 let loginMsgTimer;
 function flashLoginMsg(text, shake){
     const m = document.getElementById("loginMsg");
@@ -754,7 +747,7 @@ function flashLoginMsg(text, shake){
         box.classList.remove("shake"); void box.offsetWidth; box.classList.add("shake");
         box.addEventListener("animationend", () => box.classList.remove("shake"), {once:true});
     }
-    loginMsgTimer = setTimeout(() => {
+    loginMsgTimer = setTimeout(() => {          // แสดง 3 วินาที แล้วค่อยๆ จางหาย
         m.style.opacity = "0";
         loginMsgTimer = setTimeout(() => { m.textContent = ""; m.classList.remove("show"); }, 400);
     }, 3000);
@@ -770,7 +763,7 @@ function showLoginFail(sub){
     box.classList.remove("shake"); void box.offsetWidth; box.classList.add("shake");
     box.addEventListener("animationend", e => { if (e.target === box) box.classList.remove("shake"); }, {once:true});
     clearTimeout(loginFailTimer);
-    loginFailTimer = setTimeout(() => {
+    loginFailTimer = setTimeout(() => {          // แสดงราว 2.6 วินาที แล้วกลับไปหน้าฟอร์ม
         box.classList.remove("fail");
         const pwd = document.getElementById("pwd");
         pwd.value = ""; pwd.focus();
@@ -789,8 +782,8 @@ async function performLogin() {
         const data = await res.json();
         if (data.success) {
             localStorage.setItem("sat_auth_time", Date.now().toString());
-            document.querySelector(".login-box").classList.add("ok");
-            startDashboard();
+            document.querySelector(".login-box").classList.add("ok");   // แสดง "ล็อกอินสำเร็จ"
+            startDashboard();                                           // เริ่มโหลดข้อมูลไปพร้อมกัน
             setTimeout(() => {
                 document.getElementById("loginOverlay").style.display = "none";
                 document.getElementById("mainDashboard").style.display = "block";
