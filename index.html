@@ -229,7 +229,23 @@ footer{margin-top:4px;padding:12px;border-top:1px solid var(--line)}
 #screenAlert .sa-ok{border:0;color:#fff;background:linear-gradient(135deg,#0b6fa4,#0a3a5e)}
 #screenAlert .sa-out{background:transparent;color:var(--ink);border:1px solid var(--line)}
 #screenAlert button:focus-visible{outline:3px solid var(--warn);outline-offset:2px}
-@media print{#screenAlert{display:none}}
+/* ===== แจ้งเตือนหมดเวลาใช้งาน (แทน alert ของเบราว์เซอร์) ===== */
+#sessionAlert{position:fixed;inset:0;z-index:9500;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(10,30,50,.62);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+#sessionAlert .se-box{width:100%;max-width:400px;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:20px;padding:30px 26px 24px;text-align:center;box-shadow:0 18px 50px rgba(10,40,70,.35);overflow:hidden;position:relative;animation:lsPop .4s cubic-bezier(.2,1.4,.4,1) both}
+#sessionAlert .se-box::before{content:"";position:absolute;left:0;right:0;top:0;height:6px;background:linear-gradient(90deg,#5db7e8,var(--water),#0a3a5e)}
+#sessionAlert .se-ic{width:78px;height:78px;margin:0 auto 14px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:38px;background:radial-gradient(circle at 30% 30%,rgba(93,183,232,.35),rgba(11,111,164,.12));border:2px solid rgba(11,111,164,.25)}
+#sessionAlert .se-t{font-size:24px;font-weight:800;color:var(--water);margin-bottom:8px}
+#sessionAlert .se-s{font-size:15px;font-weight:600;line-height:1.65;color:var(--ink)}
+#sessionAlert .se-chip{display:inline-block;margin-top:10px;font-size:13px;font-weight:700;color:var(--water);background:rgba(11,111,164,.1);border-radius:999px;padding:3px 14px}
+#sessionAlert .se-bar{height:6px;border-radius:3px;background:var(--line);overflow:hidden;margin-top:20px}
+#sessionAlert .se-bar i{display:block;height:100%;width:100%;border-radius:3px;background:linear-gradient(90deg,#5db7e8,var(--water));transform-origin:left;animation:seDrain linear forwards}
+#sessionAlert .se-cd{font-size:13px;color:var(--mute);margin-top:8px}
+#sessionAlert .se-btn{width:100%;margin-top:16px;padding:13px;border:0;border-radius:12px;font:800 16px 'Noto Sans Thai',sans-serif;color:#fff;cursor:pointer;background:linear-gradient(135deg,#0b6fa4,#0a3a5e);box-shadow:0 4px 14px rgba(11,111,164,.28);transition:transform .15s,box-shadow .15s}
+#sessionAlert .se-btn:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(11,111,164,.38)}
+#sessionAlert .se-btn:focus-visible{outline:3px solid var(--warn);outline-offset:2px}
+@keyframes seDrain{to{transform:scaleX(0)}}
+@media(prefers-reduced-motion:reduce){#sessionAlert .se-box{animation:none}}
+@media print{#screenAlert,#sessionAlert{display:none}}
 </style>
 </head>
 <body>
@@ -329,7 +345,7 @@ footer{margin-top:4px;padding:12px;border-top:1px solid var(--line)}
 const PROVINCE = "พระนครศรีอยุธยา";
 // ระยะเวลาล็อกอิน (ชั่วโมง) — เปลี่ยนตัวเลขนี้ที่เดียว
 // หมายเหตุ: token ฝั่งเซิร์ฟเวอร์อยู่ได้สูงสุด 6 ชม. (ต่ออายุเมื่อใช้งาน) จึงตั้งให้ตรงกันที่ 6 ชม.
-const SESSION_HOURS = 0.05;
+const SESSION_HOURS = 6;
 const SESSION_MS = SESSION_HOURS * 60 * 60 * 1000;
 // แจ้งเตือนเมื่ออยู่หน้าจอนี้ต่อเนื่องนานเกินกำหนด (นาที) — ตั้งเป็น 0 เพื่อปิดการแจ้งเตือน
 // นับเฉพาะเวลาที่แท็บนี้เปิดอยู่บนหน้าจอ (แท็บที่ถูกซ่อน/ย่อหน้าต่างไม่นับ)
@@ -847,10 +863,61 @@ function startDashboard() {
     sessionTimer = setInterval(() => {
         const authTime = localStorage.getItem("sat_auth_time");
         if (!getToken() || !authTime || (Date.now() - parseInt(authTime) >= SESSION_MS)) {
-            alert("หมดเวลาการใช้งาน (" + SESSION_HOURS + " ชั่วโมง) ระบบจะทำการออกจากระบบอัตโนมัติ");
-            showLogin();
+            showSessionExpired();
         }
     }, 60000);
+}
+
+/* ===== หน้าต่างแจ้งหมดเวลาใช้งาน ===== */
+function fmtDuration(h){
+    const m = Math.round(h * 60);
+    if (m < 60) return m + " นาที";
+    return Math.floor(m / 60) + " ชั่วโมง" + (m % 60 ? " " + (m % 60) + " นาที" : "");
+}
+
+function showSessionExpired() {
+    if (document.getElementById("sessionAlert")) return;
+    const WAIT = 15; // วินาทีก่อนกลับหน้าล็อกอินอัตโนมัติ
+    // หยุดการดึงข้อมูลและล้าง token ทันที (ข้อมูลหลังม่านเบลอไม่อัปเดตต่อ)
+    clearInterval(dashboardInterval);
+    clearInterval(sessionTimer);
+    stopScreenWatch();
+    clearSession();
+
+    const o = document.createElement("div");
+    o.id = "sessionAlert";
+    o.setAttribute("role", "alertdialog");
+    o.setAttribute("aria-modal", "true");
+    o.setAttribute("aria-labelledby", "seTitle");
+    o.setAttribute("data-html2canvas-ignore", "true");
+    o.innerHTML = `<div class="se-box">
+      <div class="se-ic">🔒</div>
+      <div class="se-t" id="seTitle">หมดเวลาการใช้งาน</div>
+      <div class="se-s">เพื่อความปลอดภัยของข้อมูล<br>ระบบออกจากระบบให้อัตโนมัติแล้ว
+        <br><span class="se-chip">ใช้งานครบ ${fmtDuration(SESSION_HOURS)}</span></div>
+      <div class="se-bar"><i style="animation-duration:${WAIT}s"></i></div>
+      <div class="se-cd">กลับหน้าเข้าสู่ระบบอัตโนมัติใน <b id="seCount">${WAIT}</b> วินาที</div>
+      <button type="button" class="se-btn" id="seOk">เข้าสู่ระบบอีกครั้ง</button>
+    </div>`;
+    document.body.appendChild(o);
+
+    let left = WAIT, done = false, tick;
+    const go = () => {
+        if (done) return;
+        done = true;
+        clearInterval(tick);
+        o.remove();
+        showLogin();
+    };
+    tick = setInterval(() => {
+        left--;
+        const c = document.getElementById("seCount");
+        if (c) c.textContent = left;
+        if (left <= 0) go();
+    }, 1000);
+    o.querySelector("#seOk").onclick = go;
+    o.addEventListener("keydown", e => { if (e.key === "Escape" || e.key === "Enter") go(); });
+    o.querySelector("#seOk").focus();
 }
 
 document.getElementById("btnLogout").addEventListener("click", () => {
