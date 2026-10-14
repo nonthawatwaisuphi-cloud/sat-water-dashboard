@@ -81,9 +81,6 @@ a{color:var(--water)}
 .day .rain{display:inline-flex;align-items:center;gap:3px;font-size:13px;font-weight:800;border-radius:999px;padding:2px 10px;margin-top:4px;background:rgba(93,113,132,.14);color:var(--mute)}
 .day .rain.some{background:rgba(11,111,164,.16);color:var(--water)}
 .day .rain.heavy{background:var(--bad);color:#fff}
-.rbar{width:80%;height:5px;border-radius:3px;background:var(--line);overflow:hidden;margin-top:4px}
-.rbar i{display:block;height:100%;background:linear-gradient(90deg,#5db7e8,var(--water))}
-.rbar i.heavy{background:linear-gradient(90deg,#f08a74,var(--bad))}
 .day.today{border:2px solid var(--water);box-shadow:0 4px 14px rgba(11,111,164,.3);background-image:linear-gradient(rgba(11,111,164,.08),rgba(11,111,164,.08))}
 .day.today .dn{color:var(--water)}
 .c-sun{background-color:rgba(255,196,0,.14)}.c-cloud{background-color:rgba(120,140,160,.14)}.c-rain{background-color:rgba(11,111,164,.14)}.c-storm{background-color:rgba(110,70,170,.16)}.c-cold{background-color:rgba(80,180,220,.14)}.c-hot{background-color:rgba(217,56,30,.14)}
@@ -486,7 +483,6 @@ function renderWeather(days, note){
     return `<div class="day ${cl}${i==0?" today":""}"><span class="dn">${dn}</span><span class="dd">${new Date(d.date).toLocaleDateString("th-TH",{day:"numeric",month:"short"})}</span><div class="ic">${ic}</div>
       <div class="tx">${tx}</div>
       <div class="rain${rcls}">💧 ${d.rainTxt}</div>
-      <div class="rbar"><i class="${rcls.trim()}" style="width:${Math.min(100,(rv||0)/HEAVY_RAIN_MM*100)}%"></i></div>
       <div class="tmp"><span class="hi">${Math.round(d.max)}°</span> / <span class="lo">${Math.round(d.min)}°</span></div></div>`;}).join("");
   document.getElementById("wxsrc").textContent = note;
 }
