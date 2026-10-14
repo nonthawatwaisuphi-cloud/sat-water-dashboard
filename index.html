@@ -3,7 +3,6 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta http-equiv="refresh" content="900">
 <title>สถานการณ์น้ำทีม SAT รพ.พระนครศรีอยุธยา</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;600;800&display=swap" rel="stylesheet">
 <style>
@@ -329,8 +328,8 @@ footer{margin-top:4px;padding:12px;border-top:1px solid var(--line)}
 /* ===== ตั้งค่า ===== */
 const PROVINCE = "พระนครศรีอยุธยา";
 // ระยะเวลาล็อกอิน (ชั่วโมง) — เปลี่ยนตัวเลขนี้ที่เดียว
-// หมายเหตุ: token ฝั่งเซิร์ฟเวอร์อยู่ได้สูงสุด 6 ชม. (ต่ออายุเมื่อใช้งาน) ตัวที่หมดก่อนจะเป็นตัวกำหนด
-const SESSION_HOURS = 8;
+// หมายเหตุ: token ฝั่งเซิร์ฟเวอร์อยู่ได้สูงสุด 6 ชม. (ต่ออายุเมื่อใช้งาน) จึงตั้งให้ตรงกันที่ 6 ชม.
+const SESSION_HOURS = 6;
 const SESSION_MS = SESSION_HOURS * 60 * 60 * 1000;
 // แจ้งเตือนเมื่ออยู่หน้าจอนี้ต่อเนื่องนานเกินกำหนด (นาที) — ตั้งเป็น 0 เพื่อปิดการแจ้งเตือน
 // นับเฉพาะเวลาที่แท็บนี้เปิดอยู่บนหน้าจอ (แท็บที่ถูกซ่อน/ย่อหน้าต่างไม่นับ)
