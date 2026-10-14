@@ -52,6 +52,11 @@ a{color:var(--water)}
 
 .sum{background:rgba(11,111,164,.1);border-left:4px solid var(--water);border-radius:6px;padding:8px 12px;margin-bottom:12px;font-size:14px}
 
+/* ===== แถบเตือนข้อมูลน้ำล่าช้า / สถานีหาย ===== */
+.wwarn{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
+.wwarn div{background:rgba(232,162,0,.16);border-left:4px solid var(--warn);border-radius:6px;padding:8px 12px;font-size:14px;font-weight:600;color:#7a5400}
+@media (prefers-color-scheme:dark){.wwarn div{color:#f3c75a}}
+
 /* ===== การ์ดสถานี ===== */
 .st{display:flex;flex-direction:column;gap:6px;overflow:hidden;border:1px solid var(--line);border-top:4px solid var(--line);border-radius:10px;padding:14px;transition:transform .2s,box-shadow .2s}
 .st.st-ok{border-top-color:var(--water)}
@@ -334,6 +339,7 @@ a{color:var(--water)}
 <!-- 2) ระดับน้ำ -->
 <section>
   <h2>ระดับน้ำในพื้นที่</h2>
+  <div class="wwarn" id="waterWarn"></div>
   <div class="sum" id="sum"></div>
   <div class="stations" id="stations"></div>
   <div class="src" id="stsrc"></div>
@@ -382,7 +388,7 @@ const SCREEN_REPEAT_MIN = 30;
 const FLOW_SCALE = 3000;
 // ฝนตั้งแต่ค่านี้ (มม./วัน) ขึ้นไปถือว่าฝนหนัก ใช้ไฮไลต์สีแดงในการ์ดพยากรณ์
 const HEAVY_RAIN_MM = 35;
-const PROXY = "https://script.google.com/macros/s/AKfycbxLVz8rynSAy10_Ty35A9yUH9vg3ziXFj1LKNMSDctM_r8WOjXS_Ko7sBd9fPEi9WhXQg/exec";
+const PROXY = "https://script.google.com/macros/s/AKfycbzlCnSneA642RFRfpjTIo3NA6Jx1PQyQOYmn4TIOlCp3F3kVKvisyR6tv7xp-1wSEyS3g/exec";
 
 // ใช้รูปโลโก้เดียวกับหน้า login ไม่ต้องฝังซ้ำ
 document.getElementById("hdLogo").src = document.getElementById("loginLogo").src;
@@ -442,9 +448,24 @@ function drawAlert(){
   const title = {ok:"สถานการณ์ปกติ",warn:"เฝ้าระวัง",bad:"แจ้งเตือน: น้ำใกล้/ล้นตลิ่ง"}[cls];
   let sub = `${worst.name} ${d<0?"สูงกว่าตลิ่ง":"ต่ำกว่าตลิ่ง"} ${Math.abs(d).toFixed(2)} ม. (${txt})`;
   if(DATA.stale) sub += ` · ⚠️ ข้อมูลระดับน้ำเป็นข้อมูลเก่า (${DATA.updated})`;
+  if(DATA.delayed) sub += ` · ⏱️ ข้อมูลล่าช้า${DATA.dataAge!=null?" "+DATA.dataAge.toFixed(1)+" ชม.":""}`;
   if(WX_MAXRAIN && WX_MAXRAIN.v >= 0.1) sub += ` · ฝนสูงสุดในช่วงพยากรณ์ ${WX_MAXRAIN.v.toFixed(1)} มม. (${WX_MAXRAIN.label})`;
   bar.className = "alert " + (cls==="ok"?"":cls);
   bar.innerHTML = `<div class="ai">${ic}</div><div><div class="at">${title}</div><div class="as">${esc(sub)}</div></div>`;
+}
+
+/* ===== แถบเตือนข้อมูลน้ำล่าช้า / สถานีหาย ===== */
+function drawWaterWarn(){
+  const el = document.getElementById("waterWarn");
+  if(!el) return;
+  const msgs = [];
+  if(DATA.delayed){
+    msgs.push(`⏱️ ข้อมูลระดับน้ำล่าช้า${DATA.dataAge!=null?" "+DATA.dataAge.toFixed(1)+" ชม.":""} · ค่าล่าสุดจากสถานีเมื่อ ${esc(DATA.dataTime||"-")} น. (ต้นทางยังไม่อัปเดต)`);
+  }
+  if(DATA.missing && DATA.missing.length){
+    msgs.push(`❓ ไม่พบข้อมูลสถานี ${esc(DATA.missing.join(", "))} จากต้นทาง${DATA.missing.includes("S.26")?" (S.26 อาจกระทบค่าปริมาณน้ำเขื่อนพระรามหก)":""}`);
+  }
+  el.innerHTML = msgs.map(m=>`<div>${m}</div>`).join("");
 }
 
 function drawStations(){
@@ -468,7 +489,8 @@ function drawStations(){
   document.getElementById("sum").innerHTML = `จุดที่น้ำใกล้ตลิ่งที่สุด: <b>${esc(near.name)}</b> ${num(near.diff)<0?"สูงกว่าตลิ่ง":"ต่ำกว่าตลิ่ง"} ${Math.abs(num(near.diff)).toFixed(2)} ม. · ทั้งหมด ${DATA.stations.length} สถานี`;
   document.getElementById("stsrc").textContent = DATA.stale
     ? `⚠️ ThaiWater ไม่พร้อมใช้งาน — กำลังแสดงข้อมูลเก่า ดึงสำเร็จล่าสุดเมื่อ ${DATA.updated} (ค่าจริงอาจต่างจากนี้)`
-    : `ข้อมูลล่าสุด ${DATA.updated} · ศูนย์ข้อมูลน้ำระดับจังหวัด / กรมชลประทาน`;
+    : `ดึงข้อมูลเมื่อ ${DATA.updated} · ศูนย์ข้อมูลน้ำระดับจังหวัด / กรมชลประทาน`;
+  drawWaterWarn();
   drawAlert();
 }
 
@@ -554,6 +576,11 @@ function updateWater(w){
     waterFailed = !!w.stale;
     DATA.stale = !!w.stale;
     DATA.updated = w.update;
+    // ข้อมูลล่าช้า / สถานีที่หายไป (ส่งมาจาก thaiwater.gs)
+    DATA.dataTime = w.dataTime || null;
+    DATA.dataAge = typeof w.dataAgeHours === "number" ? w.dataAgeHours : null;
+    DATA.delayed = !!w.delayed;
+    DATA.missing = Array.isArray(w.missing) ? w.missing : [];
     // S.26 (ท้ายเขื่อนพระรามหก) ถูกดึงมาเพื่อใช้เป็นค่าปริมาณน้ำใน flow เท่านั้น ไม่แสดงเป็นการ์ดระดับน้ำ
     DATA.stations = w.stations.filter(s=>s.code!=="S.26").map(s=>({
         name:s.name, code:s.code, level:parseFloat(s.level).toFixed(2), bank:s.bank, bed:s.ground, diff:parseFloat(s.diff).toFixed(2),
