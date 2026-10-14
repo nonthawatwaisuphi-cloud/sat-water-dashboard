@@ -424,7 +424,8 @@ function renderWeather(days, note){
   document.getElementById("wxsrc").textContent = note;
 }
 
-async function refreshAllData() {
+async function refreshAllData(retry) {
+    retry = typeof retry === "number" ? retry : 0;
     updateTodayDate();
     try {
         const res = await fetch(PROXY + "?route=dashboard");
@@ -439,9 +440,12 @@ async function refreshAllData() {
     } catch (err) {
         console.error("Dashboard Error:", err);
         showMsg("ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้ กำลังลองใหม่...");
+        waterFailed = true;
     }
 
-    fetchPatientTable();
+    if (retry === 0) fetchPatientTable();
+    // ข้อมูลน้ำล้มเหลว → ลองใหม่ใน 20 วินาที (สูงสุด 3 ครั้ง) แทนที่จะรอรอบ 10 นาที
+    if (waterFailed && retry < 3) setTimeout(() => refreshAllData(retry + 1), 20000);
 }
 
 function updateWeather(weather){
@@ -467,14 +471,23 @@ function updateWeather(weather){
     drawAlert();
 }
 
+let waterFailed = false;
 function updateWater(w){
     if(!w || w.error || !w.stations || w.stations.length === 0) {
-        document.getElementById("sum").innerHTML = `<span style="color:var(--bad)">⚠️ ไม่สามารถดึงข้อมูลระดับน้ำได้ในขณะนี้</span>`;
+        waterFailed = true;
+        console.warn("Water data unavailable:", w && w.error ? w.error : w);
+        // มีข้อมูลรอบก่อนอยู่แล้ว → คงไว้ ไม่ล้างหน้าจอ
+        if(DATA.stations.length){
+            document.getElementById("stsrc").textContent = `⚠️ รอบล่าสุดดึงข้อมูลไม่สำเร็จ กำลังแสดงข้อมูลเดิมของ ${DATA.updated}`;
+            return;
+        }
+        document.getElementById("sum").innerHTML = `<span style="color:var(--bad)">⚠️ ไม่สามารถดึงข้อมูลระดับน้ำได้ในขณะนี้ กำลังลองใหม่...</span>`;
         const bar = document.getElementById("alertBar");
         bar.className = "alert warn";
         bar.innerHTML = `<div class="ai">❓</div><div><div class="at">ไม่ทราบสถานการณ์</div><div class="as">ไม่สามารถดึงข้อมูลระดับน้ำได้ในขณะนี้</div></div>`;
         return;
     }
+    waterFailed = false;
     DATA.updated = w.update;
     DATA.stations = w.stations.map(s=>({
         name:s.name, code:s.code, level:parseFloat(s.level).toFixed(2), bank:s.bank, bed:s.ground, diff:parseFloat(s.diff).toFixed(2),
