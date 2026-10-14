@@ -217,6 +217,20 @@ footer{margin-top:4px;padding:12px;border-top:1px solid var(--line)}
 .login-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(11,111,164,0.35); }
 .login-btn:active { transform: translateY(0); }
 .login-btn:disabled { opacity: 0.7; cursor: wait; transform: none; box-shadow: none; }
+
+/* ===== แจ้งเตือนอยู่หน้าจอนานเกินกำหนด ===== */
+#screenAlert{position:fixed;inset:0;z-index:9000;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(10,30,50,.55);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px)}
+#screenAlert .sa-box{width:100%;max-width:400px;background:var(--card);color:var(--ink);border:1px solid var(--line);border-top:6px solid var(--warn);border-radius:16px;padding:26px 24px 22px;text-align:center;box-shadow:0 14px 44px rgba(10,40,70,.3);animation:lsPop .35s cubic-bezier(.2,1.4,.4,1) both}
+#screenAlert .sa-ic{font-size:44px;line-height:1.1;margin-bottom:6px}
+#screenAlert .sa-t{font-size:22px;font-weight:800;color:#b97f00;margin-bottom:8px}
+#screenAlert .sa-s{font-size:15px;font-weight:600;line-height:1.6;color:var(--ink)}
+#screenAlert .sa-s small{display:block;margin-top:8px;font-size:13px;font-weight:400;color:var(--mute)}
+#screenAlert .sa-btns{display:flex;gap:10px;margin-top:20px}
+#screenAlert button{flex:1;padding:12px;border-radius:12px;font:700 15px 'Noto Sans Thai',sans-serif;cursor:pointer}
+#screenAlert .sa-ok{border:0;color:#fff;background:linear-gradient(135deg,#0b6fa4,#0a3a5e)}
+#screenAlert .sa-out{background:transparent;color:var(--ink);border:1px solid var(--line)}
+#screenAlert button:focus-visible{outline:3px solid var(--warn);outline-offset:2px}
+@media print{#screenAlert{display:none}}
 </style>
 </head>
 <body>
@@ -318,6 +332,11 @@ const PROVINCE = "พระนครศรีอยุธยา";
 // หมายเหตุ: token ฝั่งเซิร์ฟเวอร์อยู่ได้สูงสุด 6 ชม. (ต่ออายุเมื่อใช้งาน) ตัวที่หมดก่อนจะเป็นตัวกำหนด
 const SESSION_HOURS = 8;
 const SESSION_MS = SESSION_HOURS * 60 * 60 * 1000;
+// แจ้งเตือนเมื่ออยู่หน้าจอนี้ต่อเนื่องนานเกินกำหนด (นาที) — ตั้งเป็น 0 เพื่อปิดการแจ้งเตือน
+// นับเฉพาะเวลาที่แท็บนี้เปิดอยู่บนหน้าจอ (แท็บที่ถูกซ่อน/ย่อหน้าต่างไม่นับ)
+const SCREEN_LIMIT_MIN = 60;
+// กด "รับทราบ" แล้วจะเตือนซ้ำอีกครั้งหลังจากผ่านไปกี่นาที
+const SCREEN_REPEAT_MIN = 30;
 // สเกลตายตัวของกราฟปริมาณน้ำ (ลบ.ม./วินาที) — ขยายเองอัตโนมัติถ้าค่าจริงเกิน
 const FLOW_SCALE = 3000;
 // ฝนตั้งแต่ค่านี้ (มม./วัน) ขึ้นไปถือว่าฝนหนัก ใช้ไฮไลต์สีแดงในการ์ดพยากรณ์
@@ -705,6 +724,70 @@ document.getElementById("savePng").addEventListener("click", async e=>{
 
 let dashboardInterval, sessionTimer;
 
+/* ===== แจ้งเตือนอยู่หน้าจอนานเกินกำหนด ===== */
+let screenTimer = null, screenLast = 0, screenMs = 0, screenTotalMs = 0, titleBackup = "";
+
+function startScreenWatch() {
+    stopScreenWatch();
+    if (!(SCREEN_LIMIT_MIN > 0)) return;
+    screenMs = 0; screenTotalMs = 0; screenLast = Date.now();
+    screenTimer = setInterval(screenTick, 10000);
+}
+
+function stopScreenWatch() {
+    clearInterval(screenTimer);
+    screenTimer = null;
+    closeScreenAlert();
+}
+
+function screenTick() {
+    const now = Date.now(), dt = now - screenLast;
+    screenLast = now;
+    // ไม่นับตอนแท็บถูกซ่อน หรือขณะกำลังแสดงแจ้งเตือนอยู่
+    if (document.visibilityState !== "visible" || document.getElementById("screenAlert")) return;
+    // จำกัดไม่เกิน 30 วินาทีต่อรอบ กันนับเวลาที่เครื่องหลับ/ค้างไปด้วย
+    const step = Math.min(dt, 30000);
+    screenMs += step; screenTotalMs += step;
+    if (screenMs >= SCREEN_LIMIT_MIN * 60000) showScreenAlert();
+}
+
+function closeScreenAlert() {
+    const o = document.getElementById("screenAlert");
+    if (o) o.remove();
+    if (titleBackup) { document.title = titleBackup; titleBackup = ""; }
+}
+
+function showScreenAlert() {
+    if (document.getElementById("screenAlert")) return;
+    const mins = Math.round(screenTotalMs / 60000);
+    const o = document.createElement("div");
+    o.id = "screenAlert";
+    o.setAttribute("role", "alertdialog");
+    o.setAttribute("aria-modal", "true");
+    o.setAttribute("aria-labelledby", "saTitle");
+    o.setAttribute("data-html2canvas-ignore", "true");
+    o.innerHTML = `<div class="sa-box">
+      <div class="sa-ic">⏰</div>
+      <div class="sa-t" id="saTitle">อยู่หน้าจอนี้นานแล้ว</div>
+      <div class="sa-s">คุณเปิดหน้าสถานการณ์น้ำต่อเนื่องมาประมาณ ${mins} นาทีแล้ว<br>พักสายตาสักครู่ ยืดเส้นยืดสาย
+        <small>กด “รับทราบ” เพื่อใช้งานต่อ จะเตือนอีกครั้งใน ${SCREEN_REPEAT_MIN} นาที</small></div>
+      <div class="sa-btns"><button type="button" class="sa-ok" id="saOk">รับทราบ</button><button type="button" class="sa-out" id="saOut">ออกจากระบบ</button></div>
+    </div>`;
+    document.body.appendChild(o);
+    titleBackup = document.title;
+    document.title = "⏰ " + titleBackup;
+    const ok = () => {
+        closeScreenAlert();
+        // เริ่มนับใหม่ให้เตือนซ้ำหลัง SCREEN_REPEAT_MIN นาที
+        screenMs = Math.max(0, SCREEN_LIMIT_MIN - SCREEN_REPEAT_MIN) * 60000;
+        screenLast = Date.now();
+    };
+    o.querySelector("#saOk").onclick = ok;
+    o.querySelector("#saOut").onclick = () => { closeScreenAlert(); document.getElementById("btnLogout").click(); };
+    o.addEventListener("keydown", e => { if (e.key === "Escape") ok(); });
+    o.querySelector("#saOk").focus();
+}
+
 /* ===== Token / Session ===== */
 const getToken = () => localStorage.getItem("sat_token") || "";
 
@@ -730,6 +813,7 @@ function showLogin(notice) {
     clearSession();
     clearInterval(dashboardInterval);
     clearInterval(sessionTimer);
+    stopScreenWatch();
     document.getElementById("mainDashboard").style.display = "none";
     document.getElementById("loginOverlay").style.display = "flex";
     document.getElementById("usr").value = "";
@@ -759,6 +843,7 @@ function startDashboard() {
     clearInterval(dashboardInterval);
     clearInterval(sessionTimer);
     dashboardInterval = setInterval(refreshAllData, 600000);
+    startScreenWatch();
 
     sessionTimer = setInterval(() => {
         const authTime = localStorage.getItem("sat_auth_time");
