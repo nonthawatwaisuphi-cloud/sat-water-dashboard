@@ -323,7 +323,7 @@ const SESSION_MS = SESSION_HOURS * 60 * 60 * 1000;
 const FLOW_SCALE = 3000;
 // ฝนตั้งแต่ค่านี้ (มม./วัน) ขึ้นไปถือว่าฝนหนัก ใช้ไฮไลต์สีแดงในการ์ดพยากรณ์
 const HEAVY_RAIN_MM = 35;
-const PROXY = "https://script.google.com/macros/s/AKfycbz69stdRgToJutM2vv1Ds_ypvHUr04hwKHsLsRJ1JmcpKLYmUqxZjkILx852Wya3oUmsw/exec";
+const PROXY = "https://script.google.com/macros/s/AKfycbzMtkD52JzmNJXpcUu3umEAc-3LueqDNAvvbcWDuMcckl9wGma-hnuEZpxSo1beDJhXHA/exec";
 
 // ใช้รูปโลโก้เดียวกับหน้า login ไม่ต้องฝังซ้ำ
 document.getElementById("hdLogo").src = document.getElementById("loginLogo").src;
@@ -495,7 +495,8 @@ function updateWater(w){
     waterFailed = !!w.stale;
     DATA.stale = !!w.stale;
     DATA.updated = w.update;
-    DATA.stations = w.stations.map(s=>({
+    // S.26 (ท้ายเขื่อนพระรามหก) ถูกดึงมาเพื่อใช้เป็นค่าปริมาณน้ำใน flow เท่านั้น ไม่แสดงเป็นการ์ดระดับน้ำ
+    DATA.stations = w.stations.filter(s=>s.code!=="S.26").map(s=>({
         name:s.name, code:s.code, level:parseFloat(s.level).toFixed(2), bank:s.bank, bed:s.ground, diff:parseFloat(s.diff).toFixed(2),
         time:s.time, history:null
     }));
@@ -506,13 +507,17 @@ function updateFlow(flow){
     if(!flow || !flow.data) return;
     const vals = flow.data.map(f => Number(f.flow.toString().replace(/,/g, "")));
     const scale = Math.max(FLOW_SCALE, ...vals);
+    // ป้ายแหล่งที่มา/เวลาของแต่ละจุด (ค่าสดรายชั่วโมงจาก ThaiWater หรือรายงาน PDF รอบ 06:00)
+    const srcTag = f => f.source === "ThaiWater"
+        ? ` <small style="font-size:11px;color:var(--mute);font-weight:400">· ThaiWater ${esc(String(f.time||"").slice(11))} น.</small>`
+        : (f.source === "PDF" ? ` <small style="font-size:11px;color:var(--mute);font-weight:400">· รายงาน ชป. รอบ 06:00</small>` : "");
     document.getElementById("flow").innerHTML = flow.data.map((f,i) => {
         const val = vals[i];
         const pct = Math.min(100, val / scale * 100);
         return `
         <div class="flow-item">
             <div class="flow-label">
-                <span>${esc(f.name)}</span>
+                <span>${esc(f.name)}${srcTag(f)}</span>
                 <span><b>${val.toLocaleString()}</b><small style="font-size:12px; color:var(--mute); font-weight:400;">ลบ.ม./วินาที</small></span>
             </div>
             <div class="flow-bar-bg" role="img" aria-label="ปริมาณน้ำ ${val} จากสเกล ${scale}">
@@ -520,6 +525,10 @@ function updateFlow(flow){
             </div>
         </div>`;
     }).join("") + `<div class="flow-scale"><span>0</span><span>สเกลเต็ม ${scale.toLocaleString()} ลบ.ม./วินาที</span></div>`;
+    const liveN = flow.data.filter(f => f.source === "ThaiWater").length;
+    document.getElementById("flowSrc").textContent = liveN
+        ? "ค่ารายชั่วโมงจาก ThaiWater / กรมชลประทาน · จุดที่ไม่มีค่ารายชั่วโมงใช้รายงานสถานการณ์น้ำ กรมชลประทาน (รอบ 06:00)"
+        : "ข้อมูลจากรายงานสถานการณ์น้ำ กรมชลประทาน (รอบ 06:00)";
 }
 
 function updateImage(img){
